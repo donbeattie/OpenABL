@@ -20,7 +20,13 @@
 
 interface abl.kafka.IProducer:
   
-  method public void AMethod().
+  method public void Produce 
+    (ip_cTopic   as character,
+     ip_oMessage as rock.ql.abl.kafka.type.Message).
+
+  method public void Produce 
+    (ip_oPartition as rock.ql.abl.kafka.type.Partition,
+     ip_oMessage   as rock.ql.abl.kafka.type.Message).
 
 end interface.
 /*----------------------------------------------------------------------------*/
