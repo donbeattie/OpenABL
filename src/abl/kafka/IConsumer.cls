@@ -20,7 +20,10 @@
 
 interface abl.kafka.IConsumer:
   
-
+  method public void Consume 
+    (ip_Topics           as {&rd_kafka_topic_partition_list_t},
+     ip_oMessageConsumer as rock.ql.abl.kafka.IMessageConsumer).
+     
 end interface.
 /*----------------------------------------------------------------------------*/
 /* end-of-file: IConsumer.cls                                                 */
