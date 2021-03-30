@@ -19,7 +19,10 @@
 { abl/kafka/include/rdkafka.i }
 
 interface abl.kafka.IConfiguration:
-  
+ 
+  define public property client_id         as character no-undo get. set. 
+  define public property group_id          as character no-undo get. set. 
+  define public property bootstrap_servers as character no-undo get. set.   
 
 end interface.
 /*----------------------------------------------------------------------------*/
