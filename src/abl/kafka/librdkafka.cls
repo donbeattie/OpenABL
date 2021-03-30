@@ -1,4 +1,4 @@
-/* file: Process.cls                                                          */
+/* file: librdkafka.cls                                                       */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -13,35 +13,15 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
 block-level on error undo, throw.
 
-class abl.system.Process:
+{ abl/kafka/include/rdkafka.i }
 
-  method static public void Nap
-    (ip_iMilliseconds as integer):
-&if "{&opsys}":u begins "WIN":u &then
-    System.Threading.Thread:Sleep(ip_iMilliseconds).
-&else
-    pause (ip_iMilliseconds / 1000) no-message.
-&endif
-    return.
-  end method.
+class abl.kafka.librdkafka:
 
-&if "{&opsys}":u begins "WIN":u &then
-&else
-  method static public character UnixName ():
-    var character cUnixName.
-
-    input through value("uname":u).
-    import unformatted cUnixName.
-    input close.
-
-    return trim(cUnixName).
-  end method.
-&endif
 end class.
 /*----------------------------------------------------------------------------*/
-/* end-of-file: Process.cls                                                   */
+/* end-of-file: librdkafka.cls                                                */
