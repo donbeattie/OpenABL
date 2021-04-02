@@ -1,4 +1,4 @@
-/* file: IMessageConsumer.cls                                                 */
+/* file: File.cls                                                             */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -13,15 +13,23 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
-{ abl/kafka/include/rdkafka.i }
+block-level on error undo, throw. 
 
-interface abl.kafka.IMessageConsumer:
-  method public void ProcessMessage
-    (ip_MessageHandle as {&rd_kafka_message_t})
-
-end interface.
+class abl.system.File:
+  method static public void OpenFile
+    (ip_cFilename as character):
+                
+&if "{&opsys}":u begins "WIN":u &then
+    if search(ip_cFilename) = ? then
+       undo, throw new Progress.Lang.AppError("Specified file could not be found.", 911).
+    System.Diagnostics.Process:Start(ip_cFilename).
+&else
+    undo, throw new Progress.Lang.AppError("OpenFile only supported on Windows.")
+&endif
+  end method.
+end class.
 /*----------------------------------------------------------------------------*/
-/* end-of-file: IMessageConsumer.cls                                          */
+/* end-of-file: File.cls                                                      */

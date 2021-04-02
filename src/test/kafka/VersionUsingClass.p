@@ -1,4 +1,4 @@
-/* file: IMessageConsumer.cls                                                 */
+/* file: VersionUsingClass.p                                                  */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -13,15 +13,24 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
-{ abl/kafka/include/rdkafka.i }
+define variable oKafkaClient as abl.kafka.KafkaClient no-undo.
 
-interface abl.kafka.IMessageConsumer:
-  method public void ProcessMessage
-    (ip_MessageHandle as {&rd_kafka_message_t})
+oKafkaClient = new abl.kafka.KafkaClient().
 
-end interface.
+message "Kafka Client Version:" 
+        oKafkaClient:rd_kafka_version()
+        oKafkaClient:rd_kafka_version_string()
+   view-as alert-box. 
+
+return.
+catch eError as Progress.Lang.Error:
+  message eError:GetMessage(1) view-as alert-box.
+end catch.
+finally:
+  delete object oKafkaClient no-error.
+end finally.
 /*----------------------------------------------------------------------------*/
-/* end-of-file: IMessageConsumer.cls                                          */
+/* end-of-file: VersionUsingClass.p                                           */

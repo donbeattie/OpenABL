@@ -63,24 +63,51 @@ class abl.kafka.type.KafkaMessage:
   define public property key_len   as integer     no-undo get. set.
   define public property offset    as int64       no-undo get. set.
   
-  constructor public RKMessage ():
+  define public property PayloadValue as longchar  no-undo get. set.
+  define public property KeyValue     as character no-undo get. set.
+  
+  constructor public KafkaMessage ():
     super().
    
     return.
   end constructor.
 
-  constructor public RKMessage 
-    (ip_iRKMessage as {&rd_kafka_message_t}):
+  constructor public KafkaMessage 
+    (ip_RKMessage as {&rd_kafka_message_t}):
      
     super().
+    
+    Deserialize(ip_RKMessage).
    
     return.
   end constructor.
   
   method public void Deserialize 
-    (ip_iRKMessage as {&rd_kafka_message_t}):
+    (ip_RKMessage as {&rd_kafka_message_t}):
      
-    // Need to transform Message Pointer using the above structure into the ABL properties we can work with. But we still need the "text"...
+    define variable mMessage as memptr no-undo.
+    define variable mPayload as memptr no-undo.
+     
+/*     Write this using ConsumerUsingClass.p to see how things work out...*/
+    if ip_RKMessage > 0 then do:
+       assign set-pointer-value(mMessage) = ip_RKMessage
+              this-object:err             = integer(get-int64(mMessage,  1))
+              this-object:rkt             =         get-int64(mMessage,  9)
+              this-object:partition       = integer(get-int64(mMessage, 17))
+              this-object:payload         =         get-int64(mMessage, 25)
+              this-object:len             = integer(get-int64(mMessage, 33))
+              this-object:key             =        (get-int64(mMessage, 41))
+              this-object:key_len         = integer(get-int64(mMessage, 49))
+              this-object:offset          =        (get-int64(mMessage, 57))
+              set-pointer-value(mPayload) = this-object:payload
+              PayloadValue                = get-string(mPayload, 1)
+              set-pointer-value(mMessage) = 0
+              set-pointer-value(mPayload) = 0
+              .
+              
+    end. 
+     
+    // Destroy message? rd_kafka_message_destroy
      
     return. 
   end method.

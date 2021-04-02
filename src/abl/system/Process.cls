@@ -20,6 +20,22 @@ block-level on error undo, throw.
 
 class abl.system.Process:
 
+  method static public int64 CurrentPID ():
+    define variable iCurrentPID as int64       no-undo.
+    define variable cCurrentPID as character   no-undo.
+    
+&if "{&opsys}":u begins "WIN":u &then
+    assign iCurrentPID = System.Diagnostics.Process:GetCurrentProcess():Id no-error.
+&else
+    input through value("echo $PPID":u).
+    import unformatted cCurrentPID.
+    input close.
+    assign iCurrentPID = int64(cCurrentPID) no-error.
+&endif    
+    
+    return iCurrentPID.
+  end method.
+
   method static public void Nap
     (ip_iMilliseconds as integer):
 &if "{&opsys}":u begins "WIN":u &then
@@ -29,19 +45,6 @@ class abl.system.Process:
 &endif
     return.
   end method.
-
-&if "{&opsys}":u begins "WIN":u &then
-&else
-  method static public character UnixName ():
-    var character cUnixName.
-
-    input through value("uname":u).
-    import unformatted cUnixName.
-    input close.
-
-    return trim(cUnixName).
-  end method.
-&endif
 end class.
 /*----------------------------------------------------------------------------*/
 /* end-of-file: Process.cls                                                   */

@@ -1,4 +1,4 @@
-/* file: IConfiguration.cls                                                   */
+/* file: Configuration.cls                                                    */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -16,15 +16,35 @@
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
-{ abl/kafka/include/rdkafka.i }
+block-level on error undo, throw. 
 
-interface abl.kafka.IConfiguration:
- 
+class test.kafka.Configuration
+  implements abl.kafka.IConfiguration:
+      
   define public property client_id         as character no-undo get. set. 
   define public property group_id          as character no-undo get. set. 
   define public property bootstrap_servers as character no-undo get. set.
-  define public property auto_offset_reset as character no-undo get. set.
-
-end interface.
+  define public property auto_offset_reset as character no-undo get. set. 
+  
+  constructor public Configuration ():
+    super ().
+    
+    Initialize ().
+    
+    return.
+  end constructor. 
+  
+  method private void Initialize ():
+    
+    assign client_id         = "DonMBP16":u
+           group_id          = "foobar":u
+           bootstrap_servers = "192.168.50.55:9092":u
+           auto_offset_reset = "earliest":u
+           .
+           
+    return.
+      
+  end method.
+end class.
 /*----------------------------------------------------------------------------*/
-/* end-of-file: IConfiguration.cls                                            */
+/* end-of-file: Configuration.cls                                             */
