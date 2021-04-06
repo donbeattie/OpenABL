@@ -35,7 +35,7 @@ nav:
       - System: libraries/system.md
   - Contributing:
       - How to Contribute: contributing/HowToContribute.md
-      - MkDocs Docker: contributing/MkDocDocker.md
+      - MkDocs Docker: contributing/MkDocsDocker.md
 
 # Extensions
 markdown_extensions:
