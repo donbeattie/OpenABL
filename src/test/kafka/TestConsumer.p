@@ -1,4 +1,4 @@
-/* file: VersionUsingClass.p                                                  */
+/* file: TestConsumer.p                                                       */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -16,29 +16,25 @@
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
-&scoped-define LogFile session:temp-directory + "VersionUsingClass.txt":u
+&scoped-define LogFile session:temp-directory + "TestConsumer.log":u
 
-define variable oKafkaClient as abl.kafka.KafkaClient no-undo.
-
+define variable oKafkaConsumer as abl.kafka.IConsumer no-undo.
 /*----------------------------------------------------------------------------*/
 log-manager:logfile-name = {&LogFile}.
 log-manager:clear-log(). 
 
-oKafkaClient = new abl.kafka.KafkaClient().
+message "Start..." view-as alert-box. 
 
-message "Kafka Client Version:" 
-        oKafkaClient:rd_kafka_version()
-        oKafkaClient:rd_kafka_version_string()
-   view-as alert-box. 
+oKafkaConsumer = new abl.kafka.Consumer(new test.kafka.Configuration()).
+oKafkaConsumer:Consume("postnamechange":u, 
+                       new test.kafka.messageconsumer.DefaultConsumer()).
 
 return.
-catch eError as Progress.Lang.Error:
-  message eError:GetMessage(1) view-as alert-box.
-end catch.
 finally:
-  delete object oKafkaClient no-error.
+  delete object oKafkaConsumer no-error. 
+  message "Done" view-as alert-box. 
   log-manager:close-log().
   abl.system.File:OpenFile({&LogFile}).
 end finally.
 /*----------------------------------------------------------------------------*/
-/* end-of-file: VersionUsingClass.p                                           */
+/* end-of-file: TestConsumer.p                                                */

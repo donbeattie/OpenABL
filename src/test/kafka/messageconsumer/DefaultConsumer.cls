@@ -1,4 +1,4 @@
-/* file: IProducer.cls                                                        */
+/* file: DefaultConsumer.cls                                                  */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -16,16 +16,25 @@
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
+block-level on error undo, throw. 
+
 { abl/kafka/include/rdkafka.i }
 
-interface abl.kafka.IProducer:
+class test.kafka.messageconsumer.DefaultConsumer
+  implements abl.kafka.IMessageConsumer:
   
-  method public void Produce 
-    (ip_cTopicName as character,
-     ip_lcMessage  as longchar).
-
-  // We could open this up to lots of other parameters if desired... 
-
-end interface.
+  method public void ProcessMessage
+    (ip_MessageHandle as {&rd_kafka_message_t}):
+     
+    define variable oKafkaMessage  as abl.kafka.type.KafkaMessage no-undo. 
+     
+    log-manager:write-message(substitute("MESSAGE CONSUMER...":u)) no-error.
+    oKafkaMessage = new abl.kafka.type.KafkaMessage(ip_MessageHandle).
+    log-manager:write-message(substitute("  oKafkaMessage: &1":u, oKafkaMessage:PayloadValue)) no-error.
+    delete object oKafkaMessage no-error.
+    
+    return.
+  end method.
+end class.
 /*----------------------------------------------------------------------------*/
-/* end-of-file: IProducer.cls                                                 */
+/* end-of-file: DefaultConsumer.cls                                           */

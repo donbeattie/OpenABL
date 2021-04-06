@@ -18,19 +18,31 @@
 /*----------------------------------------------------------------------------*/
 block-level on error undo, throw. 
 
+&scoped-define StopFile session:temp-directory + "Consumer.stop":u
+
 { abl/kafka/include/rdkafka.i }
 
 class abl.kafka.Consumer
-  implements kafka.IConsumer:
+  implements abl.kafka.IConsumer:
  
-  define private variable oKafkaClient       as rock.ql.abl.kafka.KafkaClient no-undo.
-  define private variable oConfiguration     as rock.ql.abl.kafka.IConfiguration no-undo.
+  define private variable oKafkaClient    as abl.kafka.KafkaClient no-undo.
+  define private variable oConfiguration  as abl.kafka.IConfiguration no-undo.
   
-  define private variable KafkaConfiguration as {&rd_kafka_conf_t}       no-undo initial ?.
-  define private variable ConsumerHandle     as {&rd_kafka_t}            no-undo initial -1.
+  define private variable ConsumerPointer as {&rd_kafka_t} no-undo initial -1.
+  
+  define temp-table ttTopic no-undo
+    field Name               as character
+    field TopicPartitionList as {&rd_kafka_topic_partition_list_t}
+    .
+  
+  constructor public Consumer ():
+    log-manager:write-message(substitute("Default Constructor":u)) no-error.  
+    return.   
+  end constructor.
   
   constructor public Consumer 
-    (ip_oConfiguration as rock.ql.abl.kafka.IConfiguration):
+    (ip_oConfiguration as abl.kafka.IConfiguration):
+    log-manager:write-message(substitute("Configuration Constructor":u)) no-error. 
      
     Initialize(ip_oConfiguration).
      
@@ -39,82 +51,120 @@ class abl.kafka.Consumer
   
   destructor public Consumer ():
    
-    oKafkaClient:rd_kafka_consumer_close(ConsumerHandle).
+    if ConsumerPointer > 0 then 
+       oKafkaClient:rd_kafka_consumer_close(ConsumerPointer).
     
-    delete object oKafkaClient no-error.
+    if valid-object(oKafkaClient) then
+       delete object oKafkaClient no-error.
     
     return.
   end destructor.
   
-  // We could move the looping outside the Consume function and just let it consume one message and leave the looping in the hands of the client...
   method public void Consume 
-    (ip_Topics           as {&rd_kafka_topic_partition_list_t},
-     ip_oMessageConsumer as rock.ql.abl.kafka.IMessageConsumer):
-  
-    define variable iRKMessage as int64       no-undo initial 0.
-
-    oKafkaClient:rd_kafka_subscribe(ConsumerHandle,
-                                    ip_Topics). 
-  
-    //do while KeepProcessing():
-       iRKMessage = oKafkaClient:rd_kafka_consumer_poll(ConsumerHandle, 500). 
-       if iRKMessage > 0 then do:
-        
-          ip_oMessageConsumer:ProcessMessage(iRKMessage).
-          
-          oKafkaClient:rd_kafka_message_destroy(iRKMessage).
-          
-          //oKafkaClient:rd_kafka_commit(ConsumerHandle, ?, 0).
-       end.
-    //end.
-  
-  
-    return.
-  end method.
-  
-  
-  method private void Initialize
-    (ip_oConfiguration as rock.ql.abl.kafka.IConfiguration):
-     
-    if valid-object(ip_oConfiguration) then 
-       oConfiguration = ip_oConfiguration. 
-    else
-       undo, throw new Progress.Lang.AppError("Invalid Configuration Object supplied.":u, 911).
+    (ip_TopicName        as character,
+     ip_oMessageConsumer as abl.kafka.IMessageConsumer):
+      
+    define variable TopicPartitionList as {&rd_kafka_topic_partition_list_t} no-undo.
+    define variable TopicPartition     as {&rd_kafka_topic_partition_t} no-undo.
+    define variable RKMessage          as {&rd_kafka_message_t} no-undo.  
+      
+    assign TopicPartitionList = oKafkaClient:rd_kafka_topic_partition_list_new(1)
+           TopicPartition     = oKafkaClient:rd_kafka_topic_partition_list_add(TopicPartitionList, 
+                                                                               ip_TopicName, 
+                                                                               0)
+           .  
+    if oKafkaClient:rd_kafka_subscribe(ConsumerPointer, 
+                                       TopicPartitionList) = 0 then do:
        
-    assign oKafkaClient = new rock.ql.abl.kafka.KafkaClient().      
-     
-    KafkaConfiguration = KafkaConfiguration().
-              
-    ConsumerHandle = oKafkaClient:rd_kafka_new ({&RD_KAFKA_CONSUMER},
-                                                KafkaConfiguration).
-    return.
-  end method.
-  
-  method private {&rd_kafka_conf_t} KafkaConfiguration ():   
-    define variable RKConfiguration as {&rd_kafka_conf_t} no-undo initial -1.
-  
-    assign RKConfiguration = oKafkaClient:rd_kafka_conf_new ().
-    
-    if RKConfiguration > 0 then do:
-  
-       if oConfiguration:client_id <> ? then 
-          oKafkaClient:rd_kafka_conf_set (RKConfiguration, 
-                                          "client.id":u, 
-                                          oConfiguration:client_id).
-                                          
-       if oConfiguration:group_id <> ? then
-        oKafkaClient:rd_kafka_conf_set (RKConfiguration, 
-                                        "group.id":u, 
-                                        oConfiguration:group_id).                                   
-  
-       if oConfiguration:bootstrap_servers <> ? then
-          oKafkaClient:rd_kafka_conf_set (RKConfiguration, 
-                                          "bootstrap.servers":u, 
-                                          oConfiguration:bootstrap_servers).
+       do while not StopConsumer():
+                                        
+          RKMessage = oKafkaClient:rd_kafka_consumer_poll(ConsumerPointer, 10000).
+          if (RKMessage) > 0 then do:
+            
+             ip_oMessageConsumer:ProcessMessage (RKMessage).
+            
+             oKafkaClient:rd_kafka_message_destroy(RKMessage).  // Destroy message here or in KafkaMessage class on deserialize?
+          end.
+          log-manager:write-message(substitute("Waiting...":u)) no-error.
+       
+       end. // StopConsumer
+   
     end.
     
-    return RKConfiguration. 
-  end method. 
+    oKafkaClient:rd_kafka_topic_partition_list_destroy(TopicPartitionList).
+    
+    
+    return.   
+  end method.  
+ 
+  method private void Initialize
+    (ip_oConfiguration as abl.kafka.IConfiguration):
+
+    if valid-object(ip_oConfiguration) then
+       oConfiguration = ip_oConfiguration.
+    else
+       undo, throw new Progress.Lang.AppError("Invalid Configuration Object supplied.":u, 911).
+
+    assign oKafkaClient = new abl.kafka.KafkaClient().
+    
+    ConsumerPointer = KafkaConsumerConfiguration().
+
+
+
+    return.
+  end method.
+ 
+  method private {&rd_kafka_t} KafkaConsumerConfiguration ():
+    define variable RKConsumer      as {&rd_kafka_t}      no-undo initial -1.
+    define variable RKConfiguration as {&rd_kafka_conf_t} no-undo initial -1.
+
+    assign RKConfiguration = oKafkaClient:rd_kafka_conf_new ().
+
+    if RKConfiguration > 0 then do:
+       if oConfiguration:client_id <> ? then
+          oKafkaClient:rd_kafka_conf_set (RKConfiguration,
+                                          "client.id":u,
+                                          oConfiguration:client_id).
+       if oConfiguration:group_id <> ? then
+          oKafkaClient:rd_kafka_conf_set (RKConfiguration,
+                                          "group.id":u,
+                                          oConfiguration:group_id).
+       if oConfiguration:bootstrap_servers <> ? then
+          oKafkaClient:rd_kafka_conf_set (RKConfiguration,
+                                          "bootstrap.servers":u,
+                                          oConfiguration:bootstrap_servers).
+       if oConfiguration:auto_offset_reset <> ? then
+          oKafkaClient:rd_kafka_conf_set (RKConfiguration, 
+                                          "auto.offset.reset":u, 
+                                          oConfiguration:auto_offset_reset).                                 
+       RKConsumer = oKafkaClient:kafka_consumer_new(RKConfiguration).
+       if RKConsumer <= 0 or RKConsumer = ? then
+          undo, throw new Progress.Lang.AppError("Failed to create Kafka Consumer.", 911).    
+    end.
+    else
+       undo, throw new Progress.Lang.AppError("Failed to create Kafka Configuration.", 911).
+
+    return RKConsumer.
+  end method.
+  
+  method private logical StopConsumer ():
+    return search(substitute({&StopFile}, abl.system.Process:CurrentPID())) <> ?.
+  end method.
+
+  method public void CreateStopFile ():
+    output to value(substitute({&StopFile}, abl.system.Process:CurrentPID())).
+    put unformatted now.
+    output close.
+    
+    return.
+  end method.
+  
+  method public void DeleteStopFile ():
+    os-delete value(substitute({&StopFile}, abl.system.Process:CurrentPID())).
+
+    return.
+  end method.
+  
 end class.
 /*----------------------------------------------------------------------------*/
 /* end-of-file: Consumer.cls                                                  */

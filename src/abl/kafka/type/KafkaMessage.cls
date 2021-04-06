@@ -107,7 +107,11 @@ class abl.kafka.type.KafkaMessage:
               
     end. 
      
-    // Destroy message? rd_kafka_message_destroy
+    // Destroy message using rd_kafka_message_destroy or leave that to the client? 
+    // Might be safer here, because I'd know why they'd need it once everything is mined from the data.
+    // But there could be a reason... 
+    // Maybe do it in the constructor so its only done when a message is supplied 
+    // and still allows manual manipulation is the default constructor is called.
      
     return. 
   end method.

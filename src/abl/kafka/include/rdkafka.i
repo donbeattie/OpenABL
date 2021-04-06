@@ -16,15 +16,11 @@
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
+// Pointer Types - Seeing both are the same now, maybe I can use just one ABL/LIB can go away
+&GLOBAL-DEFINE PointerTypeABL int64    /* alternative to memptr */
+&GLOBAL-DEFINE PointerTypeLIB int64    /* alternative to memptr */
 
-/* I was using LONG and it wasn't working on windows. I switch to INT64 and it wored for VERSION. Try all the others now too!!! */ 
-&GLOBAL-DEFINE xxPointerTypeABL memptr   /* int64 - works on Linux but not Windows (see above). */
-&GLOBAL-DEFINE xxPointerTypeLIB memptr   /* long  - works on Linux but not Windows. -- I wonder if I used int64 instead of LONG if I can avoid memptrs !!!!*/
-
-&GLOBAL-DEFINE PointerTypeABL int64  
-&GLOBAL-DEFINE PointerTypeLIB int64
-
-&GLOBAL-DEFINE CharPointer    int64  
+&GLOBAL-DEFINE CharPointer    int64    /* char * */
 
 // rd_kafka_type_t enum values
 &GLOBAL-DEFINE RD_KAFKA_PRODUCER  0
@@ -67,6 +63,7 @@
 &GLOBAL-DEFINE rd_kafka_topic_partition_list_t  {&PointerTypeABL}
 &GLOBAL-DEFINE rd_kafka_topic_partition_t       {&PointerTypeABL}
 &GLOBAL-DEFINE rd_kafka_message_t               {&PointerTypeABL}
+&GLOBAL-DEFINE rd_kafka_error_t                 {&PointerTypeABL}
 
 &GLOBAL-DEFINE rd_kafka_type_t                  integer
 &GLOBAL-DEFINE rd_kafka_conf_res_t              integer

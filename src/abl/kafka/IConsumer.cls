@@ -12,7 +12,7 @@
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * See the License for the specific language governing permissions and 
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
@@ -21,8 +21,8 @@
 interface abl.kafka.IConsumer:
   
   method public void Consume 
-    (ip_Topics           as {&rd_kafka_topic_partition_list_t},
-     ip_oMessageConsumer as rock.ql.abl.kafka.IMessageConsumer).
+    (ip_TopicName        as character,
+     ip_oMessageConsumer as abl.kafka.IMessageConsumer).
      
 end interface.
 /*----------------------------------------------------------------------------*/

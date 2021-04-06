@@ -20,7 +20,7 @@
 
 interface abl.kafka.IMessageConsumer:
   method public void ProcessMessage
-    (ip_MessageHandle as {&rd_kafka_message_t})
+    (ip_MessageHandle as {&rd_kafka_message_t}).
 
 end interface.
 /*----------------------------------------------------------------------------*/

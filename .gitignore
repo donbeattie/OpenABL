@@ -1,0 +1,7 @@
+*.r
+.DS_Store
+protrace.*
+site/
+local/
+udpf.config
+

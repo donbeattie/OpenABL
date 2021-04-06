@@ -58,8 +58,8 @@ log-manager:write-message(substitute("mTopic: &1":u, (mTopic))) no-error.
 cPayload = cPayload + iso-date(now).
 log-manager:write-message(substitute("Publishing: &1...":u, cPayload)) no-error.
 iPublished = oKafkaClient:rd_kafka_produce(mTopic, 
-                                           0,   /* Partition */
-                                           2,   /* MsgFlags  */
+                                           {&RD_KAFKA_PARTITION_UA},   /* Partition */
+                                           {&RD_KAFKA_MSG_F_COPY},   /* MsgFlags  */
                                            cPayload).
 log-manager:write-message(substitute("Published: &1 (&2)":u,
                                      (if iPublished = 0 then "Success" else "Failure"),
