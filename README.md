@@ -7,7 +7,8 @@ Supply OpenEdge ABL Libraries for unsupported capabilities.
 ## Kafka Client
 The Kafka Client in this repo consists of an ABL wrapper around the Kafka C++ Client (librdkafka.1.6.1) as well as other supporting classes. The code supports both Windows 64-bit and Linux.
 
-The Kafka C++ Client can be obtained from NuGet the package: https://www.nuget.org/packages/librdkafka.redist/
+The Kafka C++ Client can be obtained from NuGet the package:
+https://www.nuget.org/packages/librdkafka.redist/
 
 ```
 nuget install librdkafka.redist -Version 1.6.1
@@ -43,6 +44,11 @@ services:
 
 ### Using the Kafka console to produce and consume messages
 After downloading Kafka you can use the following scripts to test your installation.
+
+```
 kafka-topics.sh --create --topic someevent --bootstrap-server localhost:9092
+
 kafka-console-producer.sh --topic someevent --bootstrap-server localhost:9092
+
 kafka-console-consumer.sh --topic someevent --from-beginning --bootstrap-server localhost:9092
+```
