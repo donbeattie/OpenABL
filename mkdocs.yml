@@ -1,0 +1,74 @@
+# Copyright 2021 Don Beattie
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Project information
+site_name: Open ABL
+site_description: Open Source ABL Libraries
+site_author: Don Beattie
+site_url: https://github.com/donbeattie/OpenEdge
+
+# Repository
+repo_name:  donbeattie/OpenEdge
+repo_url: https://github.com/donbeattie/OpenEdge
+edit_uri: ""
+
+# Theme and overrides, i.e. language partial
+theme:
+  name: material
+
+# Page tree
+nav:
+  - Home: index.md
+  - Libraries:
+      - Kafka: libraries/kafka.md
+      - System: libraries/system.md
+  - Contributing:
+      - How to Contribute: contributing/HowToContribute.md
+      - MkDocs Docker: contributing/MkDocDocker.md
+
+# Extensions
+markdown_extensions:
+  - markdown.extensions.admonition
+  - markdown.extensions.codehilite:
+      guess_lang: false
+  - markdown.extensions.def_list
+  - markdown.extensions.footnotes
+  - markdown.extensions.meta
+  - markdown.extensions.toc:
+      permalink: true
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Copyright
+copyright: "Copyright &copy; 2021 Don Beattie"
+
+# Plugins
+plugins:
+  - search
+  - minify:
+      minify_html: true
