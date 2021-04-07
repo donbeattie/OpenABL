@@ -40,7 +40,7 @@ and use the the following commands to preview the site locally in your browser.
     ```
 
 
-[MkDocs and Materials using Docker]: https://github.com/pages/donbeattie/OpenEdge/contributing/MkDocsDocker/
+[MkDocs and Materials using Docker]: https://github.com/pages/donbeattie/OpenABL/contributing/MkDocsDocker/
 [Shortcut Scripts]: ../MkDocsDocker/#using-shortcut-script
-[GitHub Repository]: https://github.com/donbeattie/OpenEdge
-[GitHub Issue]: https://github.com/donbeattie/OpenEdge/issues
+[GitHub Repository]: https://github.com/donbeattie/OpenABL
+[GitHub Issue]: https://github.com/donbeattie/OpenABL/issues

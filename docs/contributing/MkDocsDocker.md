@@ -238,4 +238,4 @@ The following is the syntax to use the [scripts] defined above. The MacOS versio
         new     - Create a new MkDocs project in the current directory
     ```
 
-[scripts]: https://git.rockfin.com/AMP/CodingStandards/tree/master/src/scripts
+[scripts]: https://github.com/donbeattie/OpenABL/tree/master/src/scripts

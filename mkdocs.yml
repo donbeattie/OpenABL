@@ -16,11 +16,11 @@
 site_name: Open ABL Project
 site_description: Open Source ABL Libraries
 site_author: Don Beattie
-site_url: https://github.com/donbeattie/OpenEdge
+site_url: https://github.com/pages/donbeattie/OpenABL
 
 # Repository
-repo_name:  donbeattie/OpenEdge
-repo_url: https://github.com/donbeattie/OpenEdge
+repo_name:  donbeattie/OpenABL
+repo_url: https://github.com/donbeattie/OpenABL
 edit_uri: ""
 
 # Theme and overrides, i.e. language partial
