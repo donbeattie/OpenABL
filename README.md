@@ -1,54 +1,37 @@
-# OpenEdge Source
+# Open ABL Project
+
+---
 
 ## Objective
 
-Supply OpenEdge ABL Libraries for unsupported capabilities.
+Supply OpenEdge ABL Libraries to extent OpenEdge capabilities.
 
-## Kafka Client
-The Kafka Client in this repo consists of an ABL wrapper around the Kafka C++ Client (librdkafka.1.6.1) as well as other supporting classes. The code supports both Windows 64-bit and Linux.
 
-The Kafka C++ Client can be obtained from NuGet the package:
-https://www.nuget.org/packages/librdkafka.redist/
+## Source Code
 
-```
-nuget install librdkafka.redist -Version 1.6.1
-```
+Source code for the various libraries can be found in the [src folder].
 
-### Kafka using Docker
-I used the following to setup Docker containers for developing and testing the Kafka Client:
+Code is organized in two primary folders, __abl__ and __test__.
 
-docker-compose.yml
+* The __abl__ folder contains the libraries in their most basic form.
+These libraries should be supported in any ABL application (Linux and Windows).
+If the libraries require application level implementations to be injected, examples will be found in  __test__.
 
-```
-version: "3"
-services:
-  zookeeper:
-    image: 'bitnami/zookeeper:latest'
-    ports:
-      - '2181:2181'
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
-  kafka:
-    image: 'bitnami/kafka:latest'
-    ports:
-      - '9092:9092'
-    environment:
-      - KAFKA_BROKER_ID=1
-      - KAFKA_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://DonMBP16:9092
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
-    depends_on:
-      - zookeeper
-```
+* The __test__ folder contains implementations or examples of using the libraries found in __abl__.
 
-### Using the Kafka console to produce and consume messages
-After downloading Kafka you can use the following scripts to test your installation.
 
-```
-kafka-topics.sh --create --topic someevent --bootstrap-server localhost:9092
+## Documentation
 
-kafka-console-producer.sh --topic someevent --bootstrap-server localhost:9092
+The source of the documentation, found in the [doc folder], is written using Markdown and compiled by MkDocs.
+The compiled source is hosted in GitHub pages.
 
-kafka-console-consumer.sh --topic someevent --from-beginning --bootstrap-server localhost:9092
-```
+## How to Contribute
+
+Its easy to [contribute] to the Open ABL Project.
+You can modify and add libraries by making pull requests or just open an issue.
+
+---
+
+[src folder]: https://github.com/donbeattie/OpenEdge/tree/master/src/
+[doc folder]: https://github.com/donbeattie/OpenEdge/tree/master/doc/
+[contribute]: https://github.com/pages/donbeattie/OpenEdge/contributing/HowToContribute/

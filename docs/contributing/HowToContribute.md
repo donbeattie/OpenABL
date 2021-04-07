@@ -9,6 +9,7 @@
     * I will review your changes and respond.
 
 ## Contributing to the Documentation
+
 Once you've pulled the MkDocs and Materials container, pull the [GitHub Repository]
 and use the the following commands to preview the site locally in your browser.
 
@@ -37,8 +38,8 @@ and use the the following commands to preview the site locally in your browser.
     cd /<repo-location>
     mk serve
     ```
-    
-    
+
+
 [MkDocs and Materials using Docker]: https://github.com/pages/donbeattie/OpenEdge/contributing/MkDocsDocker/
 [Shortcut Scripts]: ../MkDocsDocker/#using-shortcut-script
 [GitHub Repository]: https://github.com/donbeattie/OpenEdge
