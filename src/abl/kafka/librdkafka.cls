@@ -18,17 +18,17 @@
 /*----------------------------------------------------------------------------*/
 block-level on error undo, throw.
 
-&scoped-define LoggingLevel 0
+&if opsys begins "WIN":u &then
+  &scoped-define SharedLibrary Z:\Development\GitHub\OpenABL\librdkafka.dll           
+&else
+  &scoped-define SharedLibrary kafka/librdkafka.so
+&endif
 
 { abl/kafka/include/rdkafka.i }
 
 class abl.kafka.librdkafka:
 
-&IF opsys begins "WIN":u &THEN
-  &SCOPED-DEFINE SharedLibrary C:\Development\Devel124\OpenSource\librdkafka.dll
-&ELSE
-  &SCOPED-DEFINE SharedLibrary kafka/librdkafka.so
-&ENDIF
+  define public property LoggingEnabled as logical no-undo initial false get. set.
 
   /* int rd_kafka_version(void); */
   method public integer rd_kafka_version ():
@@ -701,7 +701,8 @@ class abl.kafka.librdkafka:
   method private void LogMessage
     (ip_lcMessage as longchar):
 
-    if log-manager:logging-level >= {&LoggingLevel} then
+    //if log-manager:logging-level >= {&LoggingLevel} then
+    if LoggingEnabled then
        log-manager:write-message(substitute("&1":u, ip_lcMessage)) no-error.
 
     return.

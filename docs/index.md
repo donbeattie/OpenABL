@@ -7,6 +7,20 @@
 Supply OpenEdge ABL Libraries to extent OpenEdge capabilities.
 
 
+## Setup Project (PDSOE)
+
+The OpenABL repository is intentionally not setup as a PASOE project.
+After cloning the repository:
+
+* Update the project to be a __faceted project__ (Project Properties > Project Facets)
+* Toggle on the __OpenEdge Facet__ (Project Properties > Project Facets)
+* Add __src__ to the PROPATH (Project Properties > Progress OpenEdge > PROPATH)
+* Add __gui/ablunit.pl__ or __tty/ablunit.pl__ to the PROPATH to allow executing the supplied unit tests.
+
+!!! note "Note"
+    Its recommended that you __Apply and Close__ between each step above (with the exception of the last two).
+
+
 ## Source Code
 
 Source code for the various libraries can be found in the [src folder].

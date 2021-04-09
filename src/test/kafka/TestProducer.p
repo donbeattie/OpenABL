@@ -47,8 +47,9 @@ oKafkaProducer:Produce("postnamechange":u,
 
 return.
 finally:
-  delete object oKafkaProducer no-error. 
   message "Done" view-as alert-box. 
+  delete object oKafkaProducer no-error. 
+  
   log-manager:close-log().
   abl.system.File:OpenFile({&LogFile}).
 end finally.

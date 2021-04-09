@@ -1,7 +1,13 @@
 *.r
+*.dll
 .DS_Store
+.project
+.propath
+.settings/
 protrace.*
 site/
 local/
+build.config
 udpf.config
-
+Notes.txt
+results.xml

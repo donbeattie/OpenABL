@@ -23,7 +23,7 @@ If the libraries require application level implementations to be injected, examp
 ## Documentation
 
 The source of the documentation, found in the [doc folder], is written using Markdown and compiled by MkDocs.
-The compiled source is hosted in GitHub pages.
+The compiled [documentation] is hosted in GitHub pages.
 
 ## How to Contribute
 
@@ -35,3 +35,4 @@ You can modify and add libraries by making pull requests or just open an issue.
 [src folder]: https://github.com/donbeattie/OpenABL/tree/master/src/
 [doc folder]: https://github.com/donbeattie/OpenABL/tree/master/doc/
 [contribute]: https://github.com/pages/donbeattie/OpenABL/contributing/HowToContribute/
+[documentation]: https://github.com/pages/donbeattie/OpenABL

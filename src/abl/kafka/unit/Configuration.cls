@@ -18,7 +18,7 @@
 /*----------------------------------------------------------------------------*/
 block-level on error undo, throw. 
 
-class test.kafka.Configuration
+class abl.kafka.unit.Configuration
   implements abl.kafka.IConfiguration:
       
   define public property client_id         as character no-undo get. set. 
