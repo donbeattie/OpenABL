@@ -1,4 +1,4 @@
-/* file: utSettings.i                                                         */
+/* file: utIConsumer.cls                                                      */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -16,7 +16,14 @@
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
-&global-define KafkaClientVersion 1.6.1
+block-level on error undo, throw. 
 
+class abl.kafka.unit.utIConsumer abstract:
+
+  // Test Cases
+  @Test.  
+  method abstract public void tcConsume ().
+    
+end class.
 /*----------------------------------------------------------------------------*/
-/* end-of-file: utSettings.i                                                  */
+/* end-of-file: utIConsumer.cls                                               */

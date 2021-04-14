@@ -25,9 +25,9 @@ log-manager:clear-log().
 
 message "Start..." view-as alert-box. 
 
-oKafkaConsumer = new abl.kafka.Consumer(new test.kafka.Configuration()).
-oKafkaConsumer:Consume("postnamechange":u, 
-                       new test.kafka.messageconsumer.DefaultConsumer()).
+oKafkaConsumer = new abl.kafka.Consumer(new abl.kafka.unit.supporting.Configuration()).
+oKafkaConsumer:Consume("unittestevent":u, 
+                       new abl.kafka.unit.supporting.MessageConsumer()).
 
 return.
 finally:

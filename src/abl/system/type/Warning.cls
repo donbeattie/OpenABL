@@ -1,4 +1,4 @@
-/* file: IConfiguration.cls                                                   */
+/* file: Warning.cls                                                          */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -16,14 +16,12 @@
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
-interface abl.kafka.IConfiguration:
-  
-  method public character Get
-    (ip_cKeyName as character).
-  
-  method public OpenEdge.Core.KeyValuePair extent Get
-    (ip_eCategory as abl.kafka.type.ConfigurationCategory).
-
-end interface.
+enum abl.system.type.Warning: 
+  define enum nb   = 5407
+              l    = 5408
+              mmax = 5409
+              D    = 5410
+              .
+end enum.
 /*----------------------------------------------------------------------------*/
-/* end-of-file: IConfiguration.cls                                            */
+/* end-of-file: Warning.cls                                                   */

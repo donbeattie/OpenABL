@@ -1,4 +1,4 @@
-/* file: IConfiguration.cls                                                   */
+/* file: utIMessageConsumer.cls                                                      */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -16,14 +16,19 @@
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
-interface abl.kafka.IConfiguration:
-  
-  method public character Get
-    (ip_cKeyName as character).
-  
-  method public OpenEdge.Core.KeyValuePair extent Get
-    (ip_eCategory as abl.kafka.type.ConfigurationCategory).
-
-end interface.
+/*
+   Implementation used for Unit Testing and as an example.
+*/
 /*----------------------------------------------------------------------------*/
-/* end-of-file: IConfiguration.cls                                            */
+
+block-level on error undo, throw. 
+
+class abl.kafka.unit.utIMessageConsumer abstract:
+
+  // Test Cases
+  @Test.  
+  method abstract public void tcProcessMessage ().
+    
+end class.
+/*----------------------------------------------------------------------------*/
+/* end-of-file: utIMessageConsumer.cls                                               */

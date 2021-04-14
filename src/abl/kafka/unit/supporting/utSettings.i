@@ -1,4 +1,4 @@
-/* file: IConfiguration.cls                                                   */
+/* file: utSettings.i                                                         */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -16,14 +16,14 @@
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
-interface abl.kafka.IConfiguration:
-  
-  method public character Get
-    (ip_cKeyName as character).
-  
-  method public OpenEdge.Core.KeyValuePair extent Get
-    (ip_eCategory as abl.kafka.type.ConfigurationCategory).
+&global-define KafkaClientVersion       17170943
+&global-define KafkaClientVersionString 1.6.1
 
-end interface.
+&global-define UnitTestTopic            unittestevent
+
+// Message Consumer/Consumer
+&global-define MessageConsumerLog       session:temp-directory + "UnitTestMessageConsumer.log":u
+
+
 /*----------------------------------------------------------------------------*/
-/* end-of-file: IConfiguration.cls                                            */
+/* end-of-file: utSettings.i                                                  */

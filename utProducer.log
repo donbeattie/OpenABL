@@ -1,0 +1,29 @@
+[21/04/14@14:44:01.757-0400] P-002252 T-007880 1 4GL -- Logging level set to = 2
+[21/04/14@14:44:01.757-0400] P-002252 T-007880 1 4GL -- No entry types are activated
+[21/04/14@14:44:01.853-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_conf_new - Create Call
+[21/04/14@14:44:01.862-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_conf_new - Call Invoked
+[21/04/14@14:44:01.868-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_conf_set - Create Call
+[21/04/14@14:44:01.868-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_conf_set - Call Invoked
+[21/04/14@14:44:01.868-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_conf_set - Create Call
+[21/04/14@14:44:01.868-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_conf_set - Call Invoked
+[21/04/14@14:44:01.868-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_new - Create Call
+[21/04/14@14:44:01.873-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_new - Call Invoked
+[21/04/14@14:44:01.873-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_init_transactions - Create Call
+[21/04/14@14:44:01.873-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_init_transactions - Call Invoked
+[21/04/14@14:44:01.873-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_begin_transaction - Create Call
+[21/04/14@14:44:01.873-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_begin_transaction - Call Invoked
+[21/04/14@14:44:01.873-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_topic_conf_new - Create Call
+[21/04/14@14:44:01.873-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_topic_conf_new - Call Invoked
+[21/04/14@14:44:01.879-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_topic_conf_set - Create Call
+[21/04/14@14:44:01.879-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_topic_conf_set - Call Invoked
+[21/04/14@14:44:01.879-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_topic_new - Create Call
+[21/04/14@14:44:01.879-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_topic_new - Call Invoked
+[21/04/14@14:44:01.880-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_produce - Create Call
+[21/04/14@14:44:01.880-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_produce - Call Invoked
+[21/04/14@14:44:01.880-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_commit_transaction - Create Call
+[21/04/14@14:44:01.880-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_commit_transaction - Call Invoked
+[21/04/14@14:44:01.880-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_topic_destroy - Create Call
+[21/04/14@14:44:01.881-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_topic_destroy - Call Invoked
+[21/04/14@14:44:03.899-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_destroy - Create Call
+[21/04/14@14:44:03.915-0400] P-002252 T-007880 1 4GL APPL           rd_kafka_destroy - Call Invoked
+[21/04/14@14:44:03.916-0400] P-002252 T-007880 1 4GL ----------     Log file closed at user's request

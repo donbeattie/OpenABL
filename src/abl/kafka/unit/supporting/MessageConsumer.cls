@@ -19,21 +19,30 @@
 block-level on error undo, throw. 
 
 { abl/kafka/include/rdkafka.i }
+{ abl/kafka/unit/supporting/utSettings.i }
 
-class test.kafka.messageconsumer.DefaultConsumer
+class abl.kafka.unit.supporting.Messageconsumer
   implements abl.kafka.IMessageConsumer:
+   
+  define stream strMessage.
   
   method public void ProcessMessage
     (ip_MessageHandle as {&rd_kafka_message_t}):
-     
     define variable oKafkaMessage  as abl.kafka.type.KafkaMessage no-undo. 
      
-    log-manager:write-message(substitute("MESSAGE CONSUMER...":u)) no-error.
     oKafkaMessage = new abl.kafka.type.KafkaMessage(ip_MessageHandle).
-    log-manager:write-message(substitute("  oKafkaMessage: &1":u, oKafkaMessage:PayloadValue)) no-error.
-    delete object oKafkaMessage no-error.
     
+    output stream strMessage to value({&MessageConsumerLog}).
+    put stream strMessage unformatted 
+        now ",":u 
+        string(substring(oKafkaMessage:PayloadValue, 1, minimum(length(oKafkaMessage:PayloadValue), 512)))
+        .
+    output stream strMessage close.
+        
     return.
+    finally:
+      delete object oKafkaMessage no-error. 
+    end finally.
   end method.
 end class.
 /*----------------------------------------------------------------------------*/

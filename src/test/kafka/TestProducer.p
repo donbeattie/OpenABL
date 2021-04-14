@@ -26,25 +26,17 @@ log-manager:clear-log().
 
 message "Start..." view-as alert-box.
 
-oKafkaProducer = new abl.kafka.Producer(new test.kafka.Configuration()).
+oKafkaProducer = new abl.kafka.Producer(new abl.kafka.unit.supporting.Configuration()).
 
-oKafkaProducer:Produce("postnamechange":u,
+oKafkaProducer:Produce("unittestevent":u,
                        substitute("Sending 200 Messages &1...":u, now)).
 do iLoop = 1 to 1:
-   oKafkaProducer:Produce("postnamechange":u,
+   oKafkaProducer:Produce("unittestevent":u,
                            substitute("  Message Number &1: &2":u, iLoop, now)).
 end.
-oKafkaProducer:Produce("postnamechange":u,
+oKafkaProducer:Produce("unittestevent":u,
                        substitute("Sent 200 Messages &1.":u, now)).
                        
-/*oKafkaProducer:Produce("postnamechange":u,                                */
-/*                       substitute("From Producer Class (Aa): &1":u, now)).*/
-/*oKafkaProducer:Produce("quickstart-events":u,                             */
-/*                       substitute("From Producer Class (B): &1":u, now)). */
-/*oKafkaProducer:Produce("postnamechange":u,                                */
-/*                       substitute("From Producer Class (Cc): &1":u, now)).*/
-
-
 return.
 finally:
   message "Done" view-as alert-box. 

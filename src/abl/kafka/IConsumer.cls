@@ -19,10 +19,16 @@
 { abl/kafka/include/rdkafka.i }
 
 interface abl.kafka.IConsumer:
+ 
+ define public property StopFileName as character    no-undo get. set.
   
   method public void Consume 
     (ip_TopicName        as character,
      ip_oMessageConsumer as abl.kafka.IMessageConsumer).
+     
+  method public void CreateStopFile ().
+  
+  method public void DeleteStopFile ().
      
 end interface.
 /*----------------------------------------------------------------------------*/

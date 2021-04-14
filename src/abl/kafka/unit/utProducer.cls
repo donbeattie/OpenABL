@@ -1,4 +1,4 @@
-/* file: utlibrdkafka.cls                                                     */
+/* file: utProducer.cls                                                      */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -18,35 +18,44 @@
 /*----------------------------------------------------------------------------*/
 block-level on error undo, throw. 
 
-{ abl/kafka/include/rdkafka.i }
 { abl/kafka/unit/supporting/utSettings.i }
 
-// Using inheritance because that is how this class will most likely be used.
-class abl.kafka.unit.utlibrdkafka
-  inherits abl.kafka.librdkafka:   
+&scoped-define LogFile session:temp-directory + "utProducer.log":u
 
-  @Test.  
-  method public void tcVersion():
-    OpenEdge.Core.Assert:Equals({&KafkaClientVersion}, 
-                                super:rd_kafka_version()).
+class abl.kafka.unit.utProducer
+  inherits abl.kafka.unit.utIProducer:
+   
+  @Before.
+  method public void BeforeAllTestsProducer():
+    
+    log-manager:logfile-name = {&LogFile}.
+    log-manager:clear-log(). 
     
     return.
   end method.
-  
-  @Test.  
-  method public void tcVersionStr():
-    define variable mVersion as memptr      no-undo.
-    define variable cVersion as character   no-undo initial "":u.
 
-    assign set-pointer-value(mVersion) = super:rd_kafka_version_str()
-           cVersion                    = get-string(mVersion, 1)
-           set-pointer-value(mVersion) = 0 no-error.
-
-    OpenEdge.Core.Assert:Equals("{&KafkaClientVersionString}":u, cVersion).
+  @After.
+  method public void AfterAllTestsProducer():
+    
+    log-manager:close-log().
+    //abl.system.File:OpenFile({&LogFile}).
     
     return.
-  end method.
+  end method.    
+
+  @Test.  
+  method override public void tcProduce ():
+    define variable oKafkaProducer as abl.kafka.IProducer no-undo.
     
+    oKafkaProducer = new abl.kafka.Producer(new abl.kafka.unit.supporting.Configuration()).
+    
+    oKafkaProducer:Produce("unittestevent":u,
+                           substitute("Unit Test Message: &1...":u, now)).
+    
+    OpenEdge.Core.Assert:IsTrue(true).   
+   
+    return.
+  end method.
 end class.
 /*----------------------------------------------------------------------------*/
-/* end-of-file: utlibrdkafka.cls                                              */
+/* end-of-file: utProducer.cls                                               */

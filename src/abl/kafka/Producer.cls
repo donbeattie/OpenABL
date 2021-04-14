@@ -18,6 +18,8 @@
 /*----------------------------------------------------------------------------*/
 block-level on error undo, throw. 
 
+using abl.kafka.type.ConfigurationCategory.
+
 { abl/kafka/include/rdkafka.i }
 
 class abl.kafka.Producer
@@ -77,7 +79,7 @@ class abl.kafka.Producer
                                                {&RD_KAFKA_MSG_F_COPY},     /* MsgFlags  */
                                                ip_lcMessage).
     if iPublished <> 0 then
-       undo, throw new Progress.Lang.AppError(substitute("Failed to publish message to topic &1.":u, ip_cTopicName), 911).
+       undo, throw new Progress.Lang.AppError(substitute("Failed to publish message to topic &1.":u, ip_cTopicName), 60205).
     
     oKafkaClient:rd_kafka_commit_transaction(ProducerPointer, 500).
     
@@ -94,7 +96,7 @@ class abl.kafka.Producer
     if valid-object(ip_oConfiguration) then
        oConfiguration = ip_oConfiguration.
     else
-       undo, throw new Progress.Lang.AppError("Invalid Configuration Object supplied.":u, 911).
+       undo, throw new Progress.Lang.AppError("Invalid Configuration Object supplied.":u, 60200).
 
     assign oKafkaClient = new abl.kafka.KafkaClient().
 
@@ -106,26 +108,41 @@ class abl.kafka.Producer
   method private {&rd_kafka_t} KafkaProducerConfiguration ():
     define variable RKProducer      as {&rd_kafka_t}      no-undo initial -1.
     define variable RKConfiguration as {&rd_kafka_conf_t} no-undo initial -1.
+    define variable oProperty       as OpenEdge.Core.KeyValuePair extent no-undo.
+    define variable iLoop           as integer no-undo.
    
     assign RKConfiguration = oKafkaClient:rd_kafka_conf_new ().
 
     if RKConfiguration > 0 then do:
-       if oConfiguration:client_id <> ? then
-          oKafkaClient:rd_kafka_conf_set (RKConfiguration,
-                                          "client.id":u,
-                                          oConfiguration:client_id).
-
-       if oConfiguration:bootstrap_servers <> ? then
-          oKafkaClient:rd_kafka_conf_set (RKConfiguration,
-                                          "bootstrap.servers":u,
-                                          oConfiguration:bootstrap_servers).
+     
+       // General Kafka Properties
+       assign oProperty = oConfiguration:Get(ConfigurationCategory:GENERAL).
+       do iLoop = 1 to extent(oProperty):
+          if valid-object(oProperty[iLoop]) and oProperty[iLoop]:Value <> ? then
+             oKafkaClient:rd_kafka_conf_set (RKConfiguration,
+                                             oProperty[iLoop]:Key:ToString(),
+                                             oProperty[iLoop]:Value:ToString()).
+          delete object oProperty[iLoop] no-error.
+       end.
+       extent(oProperty) = ?.
+       
+       // Producer Specific Kafka Properties
+       assign oProperty = oConfiguration:Get(ConfigurationCategory:PRODUCER).
+       do iLoop = 1 to extent(oProperty):
+          if valid-object(oProperty[iLoop]) and oProperty[iLoop]:Value <> ? then
+             oKafkaClient:rd_kafka_conf_set (RKConfiguration,
+                                             oProperty[iLoop]:Key:ToString(),
+                                             oProperty[iLoop]:Value:ToString()).
+          delete object oProperty[iLoop] no-error.
+       end.
+       extent(oProperty) = ?.     
     
        RKProducer = oKafkaClient:kafka_producer_new(RKConfiguration).
        if RKProducer <= 0 or RKProducer = ? then
-          undo, throw new Progress.Lang.AppError("Failed to create Kafka Producer.", 911).    
+          undo, throw new Progress.Lang.AppError("Failed to create Kafka Producer.", 60201).    
     end.
     else
-       undo, throw new Progress.Lang.AppError("Failed to create Kafka Configuration.", 911).
+       undo, throw new Progress.Lang.AppError("Failed to create Kafka Configuration.", 60202).
     
     return RKProducer.
   end method.
@@ -135,13 +152,27 @@ class abl.kafka.Producer
      ip_RKProducer as {&rd_kafka_t}):
     define variable RKTopic              as {&rd_kafka_topic_t} no-undo.
     define variable RKTopicConfiguration as {&rd_kafka_topic_conf_t} no-undo initial -1.
-
+    define variable oProperty       as OpenEdge.Core.KeyValuePair extent no-undo.
+    define variable iLoop           as integer no-undo.
+    
     find first ttTopic no-lock
          where ttTopic.Name = ip_cTopic no-error.
     if not available ttTopic then do:
        assign RKTopicConfiguration = oKafkaClient:rd_kafka_topic_conf_new ().   // Should I reuse this stuff for other topics?
        if RKTopicConfiguration > 0 then do:
-          oKafkaClient:rd_kafka_topic_conf_set (RKTopicConfiguration, "acks":u, "all":u).
+          
+          // Topic Specific Kafka Properties
+          assign oProperty = oConfiguration:Get(ConfigurationCategory:TOPIC).
+          do iLoop = 1 to extent(oProperty):
+             if valid-object(oProperty[iLoop]) and oProperty[iLoop]:Value <> ? then
+                oKafkaClient:rd_kafka_topic_conf_set (RKTopicConfiguration,
+                                                      oProperty[iLoop]:Key:ToString(),
+                                                      oProperty[iLoop]:Value:ToString()).
+             delete object oProperty[iLoop] no-error.
+          end.
+          extent(oProperty) = ?. 
+          
+          //oKafkaClient:rd_kafka_topic_conf_set (RKTopicConfiguration, "acks":u, "all":u).
                                                 
           RKTopic = oKafkaClient:rd_kafka_topic_new (ip_RKProducer, ip_cTopic, RKTopicConfiguration).  
           if RKTopic > 0 then do:
@@ -153,11 +184,11 @@ class abl.kafka.Producer
           end.
           else do:
              // oKafkaClient:rd_kafka_topic_conf_destroy(RKTopicConfiguration). - This has been barfing my session
-             undo, throw new Progress.Lang.AppError("Failed to create Kafka Topic.", 911).
+             undo, throw new Progress.Lang.AppError("Failed to create Kafka Topic.", 60203).
           end.
        end.
        else
-          undo, throw new Progress.Lang.AppError("Failed to create Kafka Topic Configuration.", 911).
+          undo, throw new Progress.Lang.AppError("Failed to create Kafka Topic Configuration.", 60204).
     end.
 
     return ttTopic.TopicPointer.

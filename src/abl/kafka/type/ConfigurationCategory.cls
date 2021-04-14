@@ -1,4 +1,4 @@
-/* file: IConfiguration.cls                                                   */
+/* file: ConfigurationCategory.cls                                            */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -16,14 +16,13 @@
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
-interface abl.kafka.IConfiguration:
-  
-  method public character Get
-    (ip_cKeyName as character).
-  
-  method public OpenEdge.Core.KeyValuePair extent Get
-    (ip_eCategory as abl.kafka.type.ConfigurationCategory).
-
-end interface.
+enum abl.kafka.type.ConfigurationCategory:
+  define enum GENERAL
+              CONSUMER
+              PRODUCER
+              TOPIC
+              OPTIONAL
+              .
+end enum.
 /*----------------------------------------------------------------------------*/
-/* end-of-file: IConfiguration.cls                                            */
+/* end-of-file: ConfigurationCategory.cls                                     */

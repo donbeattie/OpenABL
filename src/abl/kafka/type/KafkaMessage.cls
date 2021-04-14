@@ -88,7 +88,6 @@ class abl.kafka.type.KafkaMessage:
     define variable mMessage as memptr no-undo.
     define variable mPayload as memptr no-undo.
      
-/*     Write this using ConsumerUsingClass.p to see how things work out...*/
     if ip_RKMessage > 0 then do:
        assign set-pointer-value(mMessage) = ip_RKMessage
               this-object:err             = integer(get-int64(mMessage,  1))
@@ -103,16 +102,11 @@ class abl.kafka.type.KafkaMessage:
               PayloadValue                = get-string(mPayload, 1)
               set-pointer-value(mMessage) = 0
               set-pointer-value(mPayload) = 0
-              .
-              
-    end. 
-     
-    // Destroy message using rd_kafka_message_destroy or leave that to the client? 
-    // Might be safer here, because I'd know why they'd need it once everything is mined from the data.
-    // But there could be a reason... 
-    // Maybe do it in the constructor so its only done when a message is supplied 
-    // and still allows manual manipulation is the default constructor is called.
-     
+              .              
+    end.
+    else
+       undo, throw new Progress.Lang.AppError("Cannot Deserialize. Invalid Kafka Message", 60300).
+  
     return. 
   end method.
 end class.

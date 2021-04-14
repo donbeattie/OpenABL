@@ -1,11 +1,8 @@
 # Kafka Client Library
 
----
-
-## Objective
-
 The Kafka Client in this repo consists of an ABL wrapper around the Kafka C++ Client (librdkafka.1.6.1) as well as other supporting classes. The code supports both Windows 64-bit and Linux.
 
+---
 
 ## Kafka Client
 
@@ -48,7 +45,7 @@ Adjust the path to where the Kafka libraries are stored (OS specific).
 &endif
 ```
 
-__abl/kafka/unit/Configuration.cls__:
+__abl/kafka/unit/supporting/Configuration.cls__:
 Make any desired changes, but bootstrap_servers must have the same value as the Kafka service.
 If using Docker as described below, use the same value as the _KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://<MyComputerName>:9092_ setting.
 

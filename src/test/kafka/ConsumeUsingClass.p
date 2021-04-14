@@ -16,6 +16,10 @@
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
+block-level on error undo, throw.
+
+using abl.kafka.type.ConfigurationCategory.
+
 { abl/kafka/include/rdkafka.i }
 
 &scoped-define LogFile session:temp-directory + "ConsumeUsingClass.txt":u
@@ -35,22 +39,22 @@ define variable iLoop              as integer no-undo.
 log-manager:logfile-name = {&LogFile}.
 log-manager:clear-log().
 
-log-manager:write-message(substitute("Consume Kafka Messages...":u)) no-error.
+log-manager:write-message(substitute("Consume Kafka Messages...":u)) no-error. 
 log-manager:write-message(substitute("-------------------------":u)) no-error.
 log-manager:write-message(substitute("Current PID: &1":u, abl.system.Process:CurrentPID())) no-error.
 
 oKafkaClient = new abl.kafka.KafkaClient().
-oConfiguration = new test.kafka.Configuration(). 
+oConfiguration = new abl.kafka.unit.supporting.Configuration(). 
 
 Conf = oKafkaClient:rd_kafka_conf_new().
-oKafkaClient:rd_kafka_conf_set(Conf, "client.id":u,         oConfiguration:client_id).
-oKafkaClient:rd_kafka_conf_set(Conf, "group.id":u,          oConfiguration:group_id).
-oKafkaClient:rd_kafka_conf_set(Conf, "bootstrap.servers":u, oConfiguration:bootstrap_servers).
-oKafkaClient:rd_kafka_conf_set(Conf, "auto.offset.reset":u, oConfiguration:auto_offset_reset).                              
+oKafkaClient:rd_kafka_conf_set(Conf, "client.id":u,         oConfiguration:Get("client.id":u)).
+oKafkaClient:rd_kafka_conf_set(Conf, "bootstrap.servers":u, oConfiguration:Get("bootstrap.servers":u)).
+oKafkaClient:rd_kafka_conf_set(Conf, "group.id":u,          oConfiguration:Get("group.id":u)).
+oKafkaClient:rd_kafka_conf_set(Conf, "auto.offset.reset":u, oConfiguration:Get("auto.offset.reset":u)).                             
 
 assign Consumer           = oKafkaClient:kafka_consumer_new(Conf)
        TopicPartitionList = oKafkaClient:rd_kafka_topic_partition_list_new(1)
-       TopicPartition     = oKafkaClient:rd_kafka_topic_partition_list_add(TopicPartitionList, "postnamechange":u, 0)
+       TopicPartition     = oKafkaClient:rd_kafka_topic_partition_list_add(TopicPartitionList, "unittestevent":u, 0)
        .
 if oKafkaClient:rd_kafka_subscribe(Consumer, TopicPartitionList) = 0 then do:
    log-manager:write-message(substitute("Get up to five messages...":u)) no-error.
@@ -62,7 +66,7 @@ if oKafkaClient:rd_kafka_subscribe(Consumer, TopicPartitionList) = 0 then do:
          log-manager:write-message(substitute("oKafkaMessage: &1":u, oKafkaMessage:PayloadValue)) no-error.
          delete object oKafkaMessage no-error.
          
-         oKafkaClient:rd_kafka_message_destroy(RKMessage).  // Destroy message here or in KafkaMessage class on deserialize?
+         oKafkaClient:rd_kafka_message_destroy(RKMessage). 
       end.
    end.
 end.

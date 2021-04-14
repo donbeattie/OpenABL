@@ -1,4 +1,4 @@
-/* file: IConfiguration.cls                                                   */
+/* file: utIProducer.cls                                                      */
 /*----------------------------------------------------------------------------*/
 /*
  * Copyright 2021 Don Beattie
@@ -16,14 +16,14 @@
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
-interface abl.kafka.IConfiguration:
-  
-  method public character Get
-    (ip_cKeyName as character).
-  
-  method public OpenEdge.Core.KeyValuePair extent Get
-    (ip_eCategory as abl.kafka.type.ConfigurationCategory).
+block-level on error undo, throw. 
 
-end interface.
+class abl.kafka.unit.utIProducer abstract:
+
+  // Test Cases
+  @Test.  
+  method abstract public void tcProduce ().
+    
+end class.
 /*----------------------------------------------------------------------------*/
-/* end-of-file: IConfiguration.cls                                            */
+/* end-of-file: utIProducer.cls                                               */

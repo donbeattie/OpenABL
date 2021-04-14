@@ -28,7 +28,7 @@ block-level on error undo, throw.
 
 class abl.kafka.librdkafka:
 
-  define public property LoggingEnabled as logical no-undo initial false get. set.
+  define public property LoggingEnabled as logical no-undo initial true get. set.
 
   /* int rd_kafka_version(void); */
   method public integer rd_kafka_version ():

@@ -31,8 +31,11 @@ theme:
 nav:
   - Home: index.md
   - Libraries:
-      - Kafka: libraries/kafka.md
-      - System: libraries/system.md
+      - Kafka:
+          - Kafka Client: libraries/kafka/kafka.md
+          - Understanding the Code: libraries/kafka/understandingthecode.md
+          - Configuration: libraries/kafka/configuration.md
+      - System: libraries/system/system.md
   - Contributing:
       - How to Contribute: contributing/HowToContribute.md
       - MkDocs Docker: contributing/MkDocsDocker.md

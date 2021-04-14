@@ -16,6 +16,8 @@
  * limitations under the License. 
 */
 /*----------------------------------------------------------------------------*/
+using abl.kafka.type.ConfigurationCategory.
+
 { abl/kafka/include/rdkafka.i }
 
 &scoped-define LogFile session:temp-directory + "ProduceUsingClass.txt":u
@@ -35,14 +37,14 @@ log-manager:clear-log().
 
 
 oKafkaClient = new abl.kafka.KafkaClient().
-oConfiguration = new test.kafka.Configuration(). 
+oConfiguration = new abl.kafka.unit.supporting.Configuration(). 
 
 mConf = oKafkaClient:rd_kafka_conf_new().
 log-manager:write-message(substitute("mConf: &1":u, (mConf))) no-error.
 
 oKafkaClient:rd_kafka_conf_set(mConf, 
-                              "bootstrap.servers":u, 
-                              oConfiguration:bootstrap_servers).
+                               "bootstrap.servers":u, 
+                               oConfiguration:Get("bootstrap.servers":u)).
 
 mTopicConf = oKafkaClient:rd_kafka_topic_conf_new().
 log-manager:write-message(substitute("mTopicConf: &1":u, (mTopicConf))) no-error.
@@ -52,7 +54,7 @@ oKafkaClient:rd_kafka_topic_conf_set(mTopicConf, "acks":u, "all":u).
 mProducer = oKafkaClient:kafka_producer_new(mConf).
 log-manager:write-message(substitute("mProducer: &1":u, (mProducer))) no-error.
 
-mTopic = oKafkaClient:rd_kafka_topic_new (mProducer, "postnamechange":u, mTopicConf).  
+mTopic = oKafkaClient:rd_kafka_topic_new (mProducer, "unittestevent":u, mTopicConf).  
 log-manager:write-message(substitute("mTopic: &1":u, (mTopic))) no-error.
 
 cPayload = cPayload + iso-date(now).
