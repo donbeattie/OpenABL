@@ -7,6 +7,7 @@
 protrace.*
 site/
 local/
+src/test/
 build.config
 udpf.config
 Notes.txt
