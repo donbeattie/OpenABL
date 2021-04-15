@@ -21,13 +21,13 @@ IF        "%OPTION%"=="version" (
     echo   mk option
     echo.
     echo OPTIONS
-    echo   Supply one of the following options to:
-    echo     help    - Display this helpful information
-    echo     version - Display MkDocs version information
-    echo     serve   - Run the built-in development server (http://localhost:8000) for the current directory (ctrl-c will stop the server)
-    echo     build   - Build the MkDocs documentation in the current directory
-    echo     deploy  - Deploy documentation to GitHub Pages from the current directory
-    echo     new     - Create a new MkDocs project in the current directory
+    echo   Supply one of the following options (in the root of a MkDocs project) to:
+    echo     help    - Display this help syntax
+    echo     version - Display MkDocs and Python versions
+    echo     serve   - Run the built-in development server at http://localhost:8000 (use control-c will stop the server)
+    echo     build   - Build the MkDocs documentation
+    echo     deploy  - Deploy documentation to GitHub Pages
+    echo     new     - Create a new MkDocs project
     echo.
 )
 
