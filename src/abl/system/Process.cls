@@ -18,6 +18,8 @@
 /*----------------------------------------------------------------------------*/
 block-level on error undo, throw.
 
+&SCOPED-DEFINE DebugMode false
+
 class abl.system.Process:
 
   method static public int64 CurrentPID ():
@@ -52,7 +54,7 @@ class abl.system.Process:
      ip_cServerAddr as character,
      ip_iServerPort as integer,
      ip_cProgram    as character,
-     ip_cPARAM      as character):
+     ip_cPARAM      as character): 
     define variable cCommand as character   no-undo initial "":u.
 
     assign cCommand =
@@ -75,11 +77,24 @@ class abl.system.Process:
 &endif
                       .
 
-&if "{&opsys}":u begins "WIN":u &then
-    os-command no-wait value(cCommand).
+    log-manager:write-message(substitute("Process &1 Configuration":u, ip_iThreadID)) no-error.
+    log-manager:write-message(substitute("  Command       : &1":u, cCommand)) no-error.
+    log-manager:write-message(substitute("  Program       : &1":u, ip_cProgram)) no-error.
+    log-manager:write-message(substitute("  Thread ID     : &1":u, ip_iThreadID)) no-error.
+    log-manager:write-message(substitute("  Parent PID    : &1":u, ip_iParentPID)) no-error.
+    log-manager:write-message(substitute("    Socket Server : &1":u, ip_cServerAddr)) no-error.
+    log-manager:write-message(substitute("    Socket Port   : &1":u, ip_iServerPort)) no-error.  
+    log-manager:write-message(substitute("  Parameters    : &1":u, ip_cPARAM)) no-error.    
+    
+&if {&DebugMode} &THEN
+    log-manager:write-message(substitute("DEBUG-MODE: STARTING PROCESS SIMULATED BUT NOT ACTUALLY STARTED...":u)) no-error. 
 &else
-    os-command silent value(cCommand).
+&if "{&OPSYS}":u begins "WIN":u &THEN
+    os-command no-wait value(cCommand).  
+&else
+    os-command silent value(cCommand).    
 &endif
+&endif 
 
     return.
   end method.
