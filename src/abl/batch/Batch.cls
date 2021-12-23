@@ -16,9 +16,27 @@
  * limitations under the License.
 */
 /*----------------------------------------------------------------------------*/
-block-level on error undo, throw.
+block-level on error undo, throw. 
 
 class abl.batch.Batch:
+
+  method public logical ValidBatchProcessImplementation   
+    (ip_cBatchProcessImpl as character):
+    define variable lValidImpl as logical    no-undo initial false.
+    define variable oBatchProcessImpl as abl.batch.IBatchProcess no-undo.
+  
+    if ip_cBatchProcessImpl <> ? and ip_cBatchProcessImpl <> "":u then do:
+       oBatchProcessImpl = dynamic-new ip_cBatchProcessImpl() no-error. 
+       if error-status:error then 
+          log-manager:write-message(error-status:get-message(1)) no-error.  
+       lValidImpl = valid-object(oBatchProcessImpl).
+    end.     
+    
+    return lValidImpl.
+    finally:
+      delete object oBatchProcessImpl no-error. 
+    end finally.
+  end method.         
 end class.
 /*----------------------------------------------------------------------------*/
 /* end-of-file: Batch.cls                                                     */
