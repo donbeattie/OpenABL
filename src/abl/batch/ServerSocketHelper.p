@@ -16,7 +16,38 @@
  * limitations under the License.
 */
 /*----------------------------------------------------------------------------*/
+/*
+   In 12.2 Progress implemented a method set-callback equivelant for 
+   set-read-response-procedure. For a Socket object handle, this can only be 
+   "READ-RESPONSE", so cannot be used for the "CONNECT" event making the 
+   enhancement useless for Server Socket classes.
+   
+   So this "helper" procedure will be used to support both set-connect-procedure
+   and set-read-response-procedure.
+*/
+/*----------------------------------------------------------------------------*/
 block-level on error undo, throw.
+
+define input  parameter ip_oServerSocket as abl.batch.SocketServer no-undo.
+
+log-manager:write-message(substitute("Server Socket Helper Procedure Running...":u)) no-error. 
+
+return.
+/*----------------------------------------------------------------------------*/
+procedure OnClientConnect:  // set-connect-procedure
+  define input parameter ip_hSocketHandle as handle no-undo.
+
+  ip_oServerSocket:OnClientConnect(ip_hSocketHandle).
+  
+  return.
+end procedure.
+
+procedure OnReadResponse:  // set-read-response-procedure
+
+  ip_oServerSocket:OnReadResponse().
+
+  return.
+end procedure.
 
 /*----------------------------------------------------------------------------*/
 /* end-of-file: ServerSocketHelper.p                                          */
