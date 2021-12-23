@@ -16,7 +16,36 @@
  * limitations under the License.
 */
 /*----------------------------------------------------------------------------*/
-block-level on error undo, throw.
+/*
+   -param: <IBatch Implementation>,
+           <Number of Agents To Start>,           
+           <Maximum Number of Agents>,
+           <Minimum Number of Agents>, 
+           <Socket Server Address>,
+           <Socket Server Port>,
+           <Implementation Specific Parameters>  
+   
+      e.g. -param "abl.batch.kafka.KafkaProducer,1,5,1,localhost,44120,extra"
+      
+      pro -p abl/batch/BrokerDriver.p -param "abl.batch.kafka.KafkaProducer,1,5,1,localhost,44120,extra"
+
+*/
+/*----------------------------------------------------------------------------*/
+block-level on error undo, throw. 
+
+define variable oBroker as abl.batch.Broker no-undo.
+/*----------------------------------------------------------------------------*/
+
+oBroker = new abl.batch.Broker(session:parameter).  
+
+return.
+catch eError as Progress.Lang.Error :
+  log-manager:write-message(substitute("Error: &1":u, eError:GetMessage(1))) no-error. 
+end catch.
+finally:
+  delete object oBroker no-error.
+  quit. 
+end finally.
 
 /*----------------------------------------------------------------------------*/
 /* end-of-file: BrokerDriver.p                                                */
