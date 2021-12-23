@@ -16,18 +16,23 @@
  * limitations under the License.
 */
 /*----------------------------------------------------------------------------*/
+/*
+   
+   pro -p abl/batch/BrokerDriver.p -param "abl.batch.kafka.KafkaConsumer,1,5,1,localhost,44120,192.168.50.68:9092,SomeTopic"
+*/
+/*----------------------------------------------------------------------------*/
 block-level on error undo, throw. 
 
-class abl.batch.kafka.KafkaProducer
+class abl.batch.kafka.KafkaConsumer
   implements abl.batch.IBatchProcess:
    
-  define public property BootstrapServer  as character no-undo get. private set.
-  define public property DestinationTopic as character no-undo get. private set.
+  define public property BootstrapServer as character no-undo get. private set.
+  define public property SourceTopic     as character no-undo get. private set.
   
-  constructor public KafkaProducer ():
+  constructor public KafkaConsumer ():
    
 /*    if proversion < "12.5":u then                                                                                                                                     */
-/*       undo, throw new Progress.Lang.AppError (substitute("KafkaProducer: Unsupported version of OpenEdge (&1). OpenEdge 12.5 or higher required.", proversion), 911).*/
+/*       undo, throw new Progress.Lang.AppError (substitute("KafkaConsumer: Unsupported version of OpenEdge (&1). OpenEdge 12.5 or higher required.", proversion), 911).*/
    
     return.
   end constructor.
@@ -36,7 +41,7 @@ class abl.batch.kafka.KafkaProducer
     (ip_cParameters as character):  // These would be the extra parameters in the original call.
 
     log-manager:write-message(substitute(" ":u)) no-error. 
-    log-manager:write-message(substitute("Setup Kafka Producer...":u)) no-error. 
+    log-manager:write-message(substitute("Setup Kafka Consumer...":u)) no-error. 
     ParseParameters(ip_cParameters).      
     log-manager:write-message(substitute(" ":u)) no-error.
      
@@ -54,25 +59,25 @@ class abl.batch.kafka.KafkaProducer
   
   method private void GetNextUnitOfWord ():
      
-    // Probably pull from the database - data change event or msg-xfer, or something better :) 
+    // Pull from Topic 
      
-    log-manager:write-message(substitute("  Get Next Unit of Work...":u)) no-error. 
+    log-manager:write-message(substitute("  Get Next Unit Of Work from Source Topic &1...":u, 
+                                         SourceTopic)) no-error.
     
     return.
   end method.
   
   method private void SendUnitOfWorkToTopic ():
    
-    // Probably should write a Kafka class to simplify Kafka producing? Otherwise we'll end up with 100 different ways.
+    // Persist to Database
    
-    log-manager:write-message(substitute("  Send Next Unit Of Work to Destination Topic &1...":u, 
-                                         DestinationTopic)) no-error. 
+    log-manager:write-message(substitute("  Persist Unit Of Work to Database...":u)) no-error. 
    
     return.
   end method.
   
   method private void ParseParameters 
-    (ip_cParameters as character): 
+    (ip_cParameters as character):
     define variable oParameters as abl.batch.Parameters no-undo.
     
     log-manager:write-message(substitute("  Parameters : &1":u, ip_cParameters)) no-error.
@@ -83,11 +88,10 @@ class abl.batch.kafka.KafkaProducer
     if BootstrapServer = ? or BootstrapServer = "":u then 
        undo, throw new Progress.Lang.AppError("Bootstrap Server not supplied.":u, 911).
    
-    DestinationTopic = oParameters:GetCharacter(2).                         
-    log-manager:write-message(substitute("    Destination Topic : &1":u, DestinationTopic)) no-error.
-    if DestinationTopic = ? or DestinationTopic = "":u then 
-       undo, throw new Progress.Lang.AppError("Destination Topic not supplied.":u, 911).
-  
+    SourceTopic = oParameters:GetCharacter(2).                               
+    log-manager:write-message(substitute("    Source Topic     : &1":u, SourceTopic)) no-error.
+    if SourceTopic = ? or SourceTopic = "":u then 
+       undo, throw new Progress.Lang.AppError("Source Topic not supplied.":u, 911).
     return.
     finally:
       delete object oParameters no-error. 
