@@ -23,7 +23,7 @@ class abl.system.Process:
   method static public int64 CurrentPID ():
     define variable iCurrentPID as int64       no-undo.
     define variable cCurrentPID as character   no-undo.
-    
+
 &if "{&opsys}":u begins "WIN":u &then
     assign iCurrentPID = System.Diagnostics.Process:GetCurrentProcess():Id no-error.
 &else
@@ -31,8 +31,8 @@ class abl.system.Process:
     import unformatted cCurrentPID.
     input close.
     assign iCurrentPID = int64(cCurrentPID) no-error.
-&endif    
-    
+&endif
+
     return iCurrentPID.
   end method.
 
@@ -43,6 +43,44 @@ class abl.system.Process:
 &else
     pause (ip_iMilliseconds / 1000) no-message.
 &endif
+    return.
+  end method.
+
+  method static public void StartOEProcess
+    (ip_iThreadID   as integer,
+     ip_iParentPID  as int64,
+     ip_cServerAddr as character,
+     ip_iServerPort as integer,
+     ip_cProgram    as character,
+     ip_cPARAM      as character):
+    define variable cCommand as character   no-undo initial "":u.
+
+    assign cCommand =
+&if "{&opsys}":u begins "WIN":u &then
+                        "_progress":u
+&else
+                        "pro":u
+&endif
+                      + substitute("-p &1 ":u, ip_cProgram)
+                      + substitute("-param ~"&1,&2,&3,&4,&5~"":u,
+                                   ip_iThreadID,
+                                   ip_iParentPID,
+                                   ip_cServerAddr,
+                                   ip_iServerPort,
+                                   ip_cPARAM)
+
+&if "{&opsys}":u begins "WIN":u &then
+&else
+                      + " ~&":u
+&endif
+                      .
+
+&if "{&opsys}":u begins "WIN":u &then
+    os-command no-wait value(cCommand).
+&else
+    os-command silent value(cCommand).
+&endif
+
     return.
   end method.
 end class.
