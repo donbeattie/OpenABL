@@ -16,9 +16,11 @@
  * limitations under the License.
 */
 /*----------------------------------------------------------------------------*/
-block-level on error undo, throw.
-
 interface abl.batch.IBatchProcess:
+  method public void SetupBatchProcess
+    (ip_cParameters as character).
+    
+  method public void ProcessUnitOfWork (). 
 end interface.
 /*----------------------------------------------------------------------------*/
 /* end-of-file: IBatchProcess.cls                                             */
