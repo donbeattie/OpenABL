@@ -27,7 +27,7 @@
    
       e.g. -param "abl.batch.kafka.KafkaProducer,1,5,1,localhost,44120,extra"
       
-      pro -p abl/batch/BrokerDriver.p -param "abl.batch.kafka.KafkaProducer,1,5,1,localhost,44120,extra"
+      pro -p abl/batch/BrokerDriver.p -param "abl.batch.kafka.KafkaProducer,1,5,1,localhost,44120,192.168.50.68:9092,BrokerAgentTopic"
 
 */
 /*----------------------------------------------------------------------------*/

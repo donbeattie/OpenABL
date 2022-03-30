@@ -29,20 +29,34 @@ class abl.batch.kafka.KafkaProducer
   define public property BootstrapServer  as character no-undo get. private set.
   define public property DestinationTopic as character no-undo get. private set.
   
+  var private abl.kafkaabl.JsonProducer oJsonProducer.
+  
   constructor public KafkaProducer ():
    
-/*    if proversion < "12.5":u then                                                                                                                                     */
-/*       undo, throw new Progress.Lang.AppError (substitute("KafkaProducer: Unsupported version of OpenEdge (&1). OpenEdge 12.5 or higher required.", proversion), 911).*/
+    if proversion < "12.5":u then
+       undo, throw new Progress.Lang.AppError (substitute("KafkaProducer: Unsupported version of OpenEdge (&1). OpenEdge 12.5 or higher required.", proversion), 911).
    
     return.
   end constructor.
+  
+  destructor public KafkaProducer ():
+   
+    log-manager:write-message(substitute("Delete Kafka Json Producer Primitives... ":u)) no-error.
+    delete object oJsonProducer no-error.
+    
+    return.
+  end method.
  
   method public void SetupBatchProcess  // Maybe call it SetupImplementation or something like that. Setup the Global Kafka stuff for the object.
     (ip_cParameters as character):  // These would be the extra parameters in the original call.
 
     log-manager:write-message(substitute(" ":u)) no-error. 
     log-manager:write-message(substitute("Setup Kafka Producer...":u)) no-error. 
-    ParseParameters(ip_cParameters).      
+    ParseParameters(ip_cParameters).
+    log-manager:write-message(substitute(" ":u)) no-error. 
+    log-manager:write-message(substitute("Setup Kafka Json Producer Primitives... ":u)) no-error. 
+    
+    oJsonProducer = new abl.kafkaabl.JsonProducer(BootstrapServer).
     log-manager:write-message(substitute(" ":u)) no-error.
      
     return.  
@@ -52,28 +66,39 @@ class abl.batch.kafka.KafkaProducer
   method public void ProcessUnitOfWork ():
     
     log-manager:write-message(substitute("Process Unit of Work...":u)) no-error.
-    GetNextUnitOfWord (). 
-    SendUnitOfWorkToTopic ().
+
+    SendUnitOfWorkToTopic (GetNextUnitOfWord ()).
     
   end method.
   
-  method private void GetNextUnitOfWord ():
+  method private Progress.Json.ObjectModel.JsonConstruct GetNextUnitOfWord ():
+    var Progress.Json.ObjectModel.JsonObject oJson.
      
-    // Probably pull from the database - data change event or msg-xfer, or something better :) 
-     
-    log-manager:write-message(substitute("  Get Next Unit of Work...":u)) no-error. 
+    log-manager:write-message(substitute("  Get Next Unit of Work...Mocking at this point...":u)) no-error. 
+    oJson = new  Progress.Json.ObjectModel.JsonObject().
+    oJson:Add("name":u, "Now":u).
+    oJson:Add("value":u, now).
+    oJson:Add("tweak":u, "Some Tweak":u).
     
-    return.
+    return oJson.
   end method.
   
-  method private void SendUnitOfWorkToTopic ():
-   
-    // Probably should write a Kafka class to simplify Kafka producing? Otherwise we'll end up with 100 different ways.
-   
+  method private void SendUnitOfWorkToTopic
+    (ip_oJsonConstruct as Progress.Json.ObjectModel.JsonConstruct):
+     
+    var abl.kafkaabl.type.Header[1] oHeader. 
+      
     log-manager:write-message(substitute("  Send Next Unit Of Work to Destination Topic &1...":u, 
                                          DestinationTopic)) no-error. 
+    //oJsonProducer:Send(DestinationTopic, ip_oJsonConstruct).    
+                                     
+    oHeader[1] = new abl.kafkaabl.type.Header("IDType", string(random(1,2))).
+    oJsonProducer:Send(DestinationTopic, ip_oJsonConstruct, oHeader).
    
     return.
+    finally:
+      delete object oHeader[1] no-error. 
+    end finally.
   end method.
   
   method private void ParseParameters 

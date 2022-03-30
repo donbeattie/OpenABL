@@ -18,14 +18,14 @@
 /*----------------------------------------------------------------------------*/
 block-level on error undo, throw. 
 
-&SCOPED-DEFINE FullSetCallBackSupport 12.3
+&SCOPED-DEFINE FullSetCallBackSupport 12.9   /* 12.3 - Can't get this to work :( */
+&SCOPED-DEFINE DefaultServerPort      44120
 
 class abl.batch.SocketServer:
-
-  define private variable iLengthMinutes as integer     no-undo initial 0.
-  define private variable hServerSocket  as handle      no-undo.
+  var integer iLengthMinutes = 0.
+  var handle hServerSocket.
 &IF proversion < "{&FullSetCallBackSupport}" &THEN
-  define private variable hSocketHelper as handle      no-undo. 
+  var handle hSocketHelper.
 &ENDIF
 
   define stream strReport.
@@ -56,7 +56,7 @@ class abl.batch.SocketServer:
     assign iLengthMinutes = ip_iLengthInMinutes. 
 
 &IF proversion < "{&FullSetCallBackSupport}" &THEN
-    run rock/ql/abl/batch/ServerSocketHelper.p
+    run abl/batch/ServerSocketHelper.p
         persistent set hSocketHelper
         (this-object).  
 &ENDIF
@@ -83,10 +83,11 @@ class abl.batch.SocketServer:
   method protected void RawReportThreadActivity
     (ip_iLengthInMinutes as integer):
 
-    define variable iTotalExecutions    as integer     no-undo initial 0.
-    define variable iTotalErrors        as integer     no-undo initial 0.
-    define variable iExecutionPerMinute as integer     no-undo initial 0.
-    define variable iThreadCount        as integer     no-undo initial 0.
+    var integer iTotalExecutions = 0,
+                iTotalErrors = 0,
+                iExecutionPerMinute = 0,
+                iThreadCount = 0
+                .
 
     log-manager:write-message(substitute(" ":u)) no-error.
     log-manager:write-message(substitute("----------------------------------------------":u)) no-error.
@@ -133,10 +134,11 @@ class abl.batch.SocketServer:
      
     &SCOPED-DEFINE BatchReport session:temp-directory + "BatchReport.txt":u 
      
-    define variable iTotalExecutions    as integer     no-undo initial 0.
-    define variable iTotalErrors        as integer     no-undo initial 0.
-    define variable iExecutionPerMinute as integer     no-undo initial 0.
-    define variable iThreadCount        as integer     no-undo initial 0.
+    var integer iTotalExecutions = 0,
+                iTotalErrors = 0,
+                iExecutionPerMinute = 0,
+                iThreadCount = 0
+                .
     
     output stream strReport to value ({&BatchReport}).
 
@@ -202,10 +204,10 @@ class abl.batch.SocketServer:
 
   method protected void SetupThreads 
     (ip_iThreads as integer):
-     
-    define variable iThread as integer     no-undo initial 0.
+    var integer iThread. 
     
     define buffer lbufttThread for ttThread.
+    
     do iThread = 1 to ip_iThreads:
        create lbufttThread.
        assign lbufttThread.ThreadID = iThread.
@@ -221,7 +223,7 @@ class abl.batch.SocketServer:
 
   method public void EnableServer
     (ip_iSocketPort as integer):
-          
+     var handle h.      
     log-manager:write-message(substitute("Enable Server: PID=&1":u, 
                                          abl.system.Process:CurrentPID())) no-error.
             
@@ -229,12 +231,13 @@ class abl.batch.SocketServer:
 &IF proversion < "{&FullSetCallBackSupport}" &THEN    
     hServerSocket:set-connect-procedure("OnClientConnect":u, hSocketHelper).
 &ELSE
-    hServerSocket:set-callback("CONNECT":u, "OnClientConnect":u).
+   
+    hServerSocket:set-callback("CONNECT":u, "OnClientConnect":u, h).
 &ENDIF    
-    hServerSocket:enable-connections(substitute("-S 44120":u,
+    hServerSocket:enable-connections(substitute("-S &1":u,
                                                 (if ip_iSocketPort > 0
                                                     then ip_iSocketPort
-                                                    else 44120))).
+                                                    else {&DefaultServerPort}))).
 
     WaitBlock:
     repeat on stop undo, leave on quit undo, leave:     
@@ -246,6 +249,7 @@ class abl.batch.SocketServer:
        wait-for connect of hServerSocket.
     end.
     
+    log-manager:write-message(substitute("hServerSocket:disable-connections()...":u)) no-error. 
     hServerSocket:disable-connections().
     
     return.
@@ -258,21 +262,23 @@ class abl.batch.SocketServer:
 &IF proversion < "{&FullSetCallBackSupport}" &THEN    
     ip_hClientInstanceSocket:set-read-response-procedure("OnReadResponse":u, hSocketHelper).
 &ELSE
+    log-manager:write-message(substitute("set-callback":u)) no-error. 
     ip_hClientInstanceSocket:set-callback("READ-RESPONSE":u, "OnReadResponse":u).
+    log-manager:write-message(substitute("get-callback: &1":u, ip_hClientInstanceSocket:get-callback-proc-name ("READ-RESPONSE":u)  )) no-error. 
+    
+    
 &ENDIF    
 
     return.
   end method.
 
   method public void OnReadResponse ():     
-    define variable lRC          as logical     no-undo initial false.
-    define variable mHeader      as memptr      no-undo.
-    define variable iDataSize    as integer     no-undo initial 0.
-    define variable mData        as memptr      no-undo.
-    define variable iMessageSize as integer     no-undo.
-    define variable cData        as character   no-undo initial "":u.
-    define variable cCommand     as character   no-undo initial "":u.
-    define variable iThread      as integer     no-undo initial ?.
+    var logical lRC = false.
+    var memptr mHeader, mData.
+    var integer iDataSize = 0, iMessageSize, iThread = ?.
+    var character cData = "":u, cCommand ="":u.
+    
+    log-manager:write-message(substitute("OnReadResponse...":u)) no-error. 
         
     if StopServer() then do:
        log-manager:write-message(substitute("STOPPING SERVER...":u)) no-error.        
@@ -336,8 +342,9 @@ class abl.batch.SocketServer:
   method protected character RemainingParameters 
     (ip_iStart      as integer,
      ip_cParameters as character):
-    define variable cRemainderParam as character  no-undo.
-    define variable iEntry   as integer     no-undo initial 0.
+      
+    var character cRemainderParam.
+    var integer iEntry = 0.
   
     do iEntry = ip_iStart to num-entries(ip_cParameters):
        assign cRemainderParam = cRemainderParam + 
@@ -350,7 +357,7 @@ class abl.batch.SocketServer:
   
   method protected integer NextBatchID 
     (ip_iThreadID as integer):
-    define variable iNextBatchID as integer    no-undo initial 1.
+    var integer iNextBatchID = 1.
   
     define buffer lbufttBatch for ttBatch. 
     for last lbufttBatch no-lock

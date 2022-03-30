@@ -59,9 +59,9 @@ class abl.system.Process:
 
     assign cCommand =
 &if "{&opsys}":u begins "WIN":u &then
-                        "_progress":u
+                        "_progres ":u
 &else
-                        "pro":u
+                        "pro ":u
 &endif
                       + substitute("-p &1 ":u, ip_cProgram)
                       + substitute("-param ~"&1,&2,&3,&4,&5~"":u,

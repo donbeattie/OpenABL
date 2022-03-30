@@ -21,9 +21,9 @@ block-level on error undo, throw.
 &SCOPED-DEFINE DebugMode true
 &SCOPED-DEFINE OpenLog   true
 
-&SCOPED-DEFINE AgentsToStart 1
-&SCOPED-DEFINE MinimumAgents 1
-&SCOPED-DEFINE MaximumAgents 5
+&SCOPED-DEFINE AgentsToStart     1
+&SCOPED-DEFINE MinimumAgents     1
+&SCOPED-DEFINE MaximumAgents     5
 
 class abl.batch.Broker:
 
@@ -77,6 +77,7 @@ class abl.batch.Broker:
    
     SetupLogging ().
     ParseParameters (ip_cStartupParameters).
+   
     StartAgents ().
    
     StartSocketServer ().
@@ -102,12 +103,12 @@ class abl.batch.Broker:
     do iLoop = 1 to AgentsToStart:
        
        // Figure out how these settings will be set... Maybe setable properties? 
-       abl.system.OpenEdge:StartProcess(iLoop, 
-                                        BrokerPID, 
-                                        SocketServerAddr, 
-                                        SocketServerPort, 
-                                        "abl/batch/AgentDriver.p":u, 
-                                        cRemainderParam).
+       abl.system.Process:StartOEProcess(iLoop, 
+                                         BrokerPID, 
+                                         SocketServerAddr, 
+                                         SocketServerPort, 
+                                         "abl/batch/AgentDriver.p":u, 
+                                         cRemainderParam).
        
     end.
     log-manager:write-message(substitute("AGENTS HAVE BEEN STARTED.":u)) no-error.
@@ -123,8 +124,14 @@ class abl.batch.Broker:
     log-manager:write-message(substitute("Starting Socket Server: PID=&1...":u,
                                          BrokerPID)) no-error.
   
-    // oSocketServer = new rock.ql.abl.loadtest.SocketServer(ip_iExpectedThreads, ip_iLengthInMinutes, 44120).
+    oSocketServer = new abl.batch.SocketServer(AgentsToStart,       //ip_iExpectedThreads,
+                                               ?,                   //ip_iLengthInMinutes,
+                                               SocketServerPort).
   
+    log-manager:write-message(substitute(" ":u)) no-error.
+    log-manager:write-message(substitute("Socket Server Completed.":u)) no-error.
+    log-manager:write-message(substitute(" ":u)) no-error.
+    
     return.
     finally:
       delete object oSocketServer no-error.     

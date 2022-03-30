@@ -1,6 +1,24 @@
+/* file: aProducer.cls                                                        */
+/*----------------------------------------------------------------------------*/
+/*
+ * Copyright 2022 Don Beattie
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+/*----------------------------------------------------------------------------*/
 block-level on error undo, throw.
 
-class abl.kafka.aProducer abstract:
+class abl.kafkaabl.aProducer abstract:
  
   var protected OpenEdge.Messaging.IProducer oProducer.
   var protected OpenEdge.Messaging.RecordBuilder oRecordBuilder.
@@ -27,7 +45,7 @@ class abl.kafka.aProducer abstract:
   
   method public void Send
     (ip_cDestinationTopic as character,
-     ip_oHeader           as abl.kafka.type.Header extent):
+     ip_oHeader           as abl.kafkaabl.type.Header extent):
          
     var OpenEdge.Messaging.IProducerRecord oRecord.
     var OpenEdge.Messaging.ISendResponse oResponse.
@@ -56,12 +74,9 @@ class abl.kafka.aProducer abstract:
     end finally.
   end method.  
   
-  
-  
- 
   method protected void AddHeaders
     (ip_oRecordBuilder as OpenEdge.Messaging.RecordBuilder,
-     ip_oHeader        as abl.kafka.type.Header extent):      
+     ip_oHeader        as abl.kafkaabl.type.Header extent):      
     var integer iLoop.
     
     ip_oRecordBuilder:AddHeader("my_correlation_id":u, guid).
@@ -94,3 +109,5 @@ class abl.kafka.aProducer abstract:
   end method.
  
 end class.
+/*----------------------------------------------------------------------------*/
+/* end-of-file: aProducer.cls                                                 */

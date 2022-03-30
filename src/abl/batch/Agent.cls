@@ -38,8 +38,9 @@ class abl.batch.Agent:
   define public property ImplementationParameters as character   no-undo initial "":u 
     get. private set.
       
-  define private variable cLogFile           as character   no-undo initial "":u.
-  define private variable oBatchProcessImpl  as abl.batch.IBatchProcess no-undo.
+  var character cLogFile = "":u.
+  var abl.batch.IBatchProcess oBatchProcessImpl.
+  var abl.batch.SocketClient oSocketClient.
  
   constructor public Agent 
     (ip_cStartupParameters as character):
@@ -75,46 +76,91 @@ class abl.batch.Agent:
     ParseParameters (ip_cStartupParameters).
 
     // This currently happening in teh LoadTest Batch.cls file. Maybe I can incorporate that in the Agent class, this class?
-    // StartSocketClient().
     
-    // Need to start the Implementation
-/*    oBatchProcessImpl = dynamic-new BatchImplementation ().       */
-/*    oBatchProcessImpl:StartBatchProcess(ImplementationParameters).*/
+    log-manager:write-message(substitute("Agent: Let's Nap A Little...5 seconds":u)) no-error.
+    abl.system.Process:Nap(5000).
     
-    // What is unit of execution??? Is that the code that does the thing?
+    log-manager:write-message(substitute("Agent: StartSocketClient...":u)) no-error.
+    StartSocketClient().
     
+    log-manager:write-message(substitute("Agent: StartProcess...":u)) no-error.
     StartProcess ().
     
     return.
   end method. 
 
   method private void ReleaseAgent ():
+   
+   log-manager:write-message(substitute("ReleaseAgent...":u)) no-error.
  
     delete object oBatchProcessImpl no-error.
+    delete object oSocketClient no-error.
     
     CloseLogging ().
     
     return.
   end method. 
 
+  method private void StartSocketClient ():
+    log-manager:write-message(substitute("Start SocketClient...":u)) no-error.
+    
+    oSocketClient = new abl.batch.SocketClient(AgentID,
+                                               SocketServerAddr,
+                                               SocketServerPort).
+    oSocketClient:SendHeartbeat().                                           
+    
+    log-manager:write-message(substitute(" ":u)) no-error.
+     
+    return.
+  end method.
 
   method private void StartProcess ():
-    define variable lContinue as logical     no-undo initial true.
+    var logical lContinue = true.
+    var int64 iMTime.
     
+    log-manager:write-message(substitute("StartProcess...":u)) no-error.
+    log-manager:write-message(substitute("Adjusting PROPATH...":u)) no-error.
+    assign propath = "C:\dlc\125\gui\messaging\OpenEdge.Messaging.pl,C:\dlc\125\gui\netlib\OpenEdge.Net.pl,":u +
+                     propath
+                     .
+    log-manager:write-message(substitute("PROPATH: &1":u, propath)) no-error.
+    log-manager:write-message(substitute("OS PATH: &1":u, os-getenv("PATH":u))) no-error.
+    
+    
+    log-manager:write-message(substitute(" ":u)) no-error.
     log-manager:write-message(substitute("Batch Implementation...":u)) no-error. 
     
+    iMTime = mtime.
     oBatchProcessImpl = dynamic-new BatchImplementation ().
     oBatchProcessImpl:SetupBatchProcess(ImplementationParameters). 
-    
+    log-manager:write-message(substitute("TOTAL SETUP Elapsed Time: &1":u, mtime - iMTime)) no-error.
+   
     
     // ENHANCE THIS WITH STUFF FROM ExecuteLoad...
+    iMTime = mtime.
     do while lContinue on error undo, leave: 
-     
+       
        oBatchProcessImpl:ProcessUnitOfWork().
-     
+       oBatchProcessImpl:ProcessUnitOfWork().
+       oBatchProcessImpl:ProcessUnitOfWork().
+       oBatchProcessImpl:ProcessUnitOfWork().
+       oBatchProcessImpl:ProcessUnitOfWork().
+       
+       oSocketClient:SendHeartbeat().
+       
+       oBatchProcessImpl:ProcessUnitOfWork().
+       oBatchProcessImpl:ProcessUnitOfWork().
+       oBatchProcessImpl:ProcessUnitOfWork().
+       oBatchProcessImpl:ProcessUnitOfWork().
+       oBatchProcessImpl:ProcessUnitOfWork().
+       
        lContinue = false.
     end.
-   
+    log-manager:write-message(substitute("TOTAL EVENT Elapsed Time: &1":u, mtime - iMTime)) no-error.
+    
+    oSocketClient:SendCompleted().
+    oSocketClient:SendStopRequest().
+    
     return.
   end method.
 

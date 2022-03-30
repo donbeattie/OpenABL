@@ -20,17 +20,20 @@ block-level on error undo, throw.
 
 class abl.batch.SocketClient:
  
-  define private variable hClientSocket as handle      no-undo.
-  define private variable iThreadID     as integer     no-undo initial 0.
+  var handle hClientSocket.
+  var integer iThreadID = 0.
   
   constructor public SocketClient 
-    (ip_iThreadID     as integer,
-     ip_cSocketServer as character):
+    (ip_iThreadID   as integer,
+     ip_cServerName as character,
+     ip_iServerPort as integer):
+      
     super ().
 
     assign iThreadID = ip_iThreadID.
     
-    SetupSocketConnection(ip_cSocketServer).
+    SetupSocketConnection(ip_cServerName,
+                          ip_iServerPort).
 
     return.
   end constructor.
@@ -42,24 +45,13 @@ class abl.batch.SocketClient:
     return.
   end destructor.   
   
-  method private logical SetupSocketConnection 
-    (ip_cSocketServer as character):
-       
-    create socket hClientSocket.
-    if ip_cSocketServer <> ? and ip_cSocketServer <> "":u then
-       hClientSocket:connect(ip_cSocketServer).       
-    else
-       hClientSocket:connect("-H localhost -S 44120":u).
-   
-    return hClientSocket:connected().
+  method public void SendHeartbeat ():
+    
+    log-manager:write-message(substitute("SocketClient: Send Heartbeat...":u)) no-error.
+    SendServerData(substitute("HEARTBEAT,&1":u, iThreadID)).
+          
+    return.
   end method.
-
-  method private void ReleaseSocketConnection ():
-    hClientSocket:disconnect() no-error. 
-    delete object hClientSocket no-error.
-
-    return.   
-  end method.  
   
   method public void SendBatchResults
     (ip_iTotalExecutions      as integer,
@@ -67,25 +59,19 @@ class abl.batch.SocketClient:
      ip_iAverageExectuionTime as integer,
      ip_iTotalErrors          as integer):
 
-    SendServerData(substitute("BATCHRESULTS,&1,&2,&3,&4":u, 
+    SendServerData(substitute("BATCHRESULTS,&1,&2,&3,&4":u,
                               iThreadID,
                               ip_iTotalExecutions,
                               ip_iTotalExecutionTime,
                               ip_iAverageExectuionTime,
                               ip_iTotalErrors)).
 
-    return.     
-  end method.
-  
-  method public void SendHeartbeat ():
-    
-    SendServerData(substitute("HEARTBEAT,&1":u, iThreadID)).
-          
     return.
   end method.
 
   method public void SendCompleted ():
     
+    log-manager:write-message(substitute("SocketClient: Send Completed...":u)) no-error.
     SendServerData(substitute("COMPLETED,&1":u, iThreadID)).
           
     return.
@@ -93,15 +79,18 @@ class abl.batch.SocketClient:
   
   method public void SendStopRequest ():
     
+    log-manager:write-message(substitute("SocketClient: Send Stop Request...":u)) no-error.
     SendServerData(substitute("STOP,&1":u, iThreadID)).
           
     return.
   end method.  
 
-  method /*private*/ void SendServerData
+/*----------------------------------------------------------------------------*/
+
+  method private void SendServerData
     (ip_cMessage as character):
 
-    define variable mData as memptr      no-undo.
+    var memptr mData.
         
     assign set-size(mData)       = 0
            set-size(mData)       = 4 + length(ip_cMessage) + 1 
@@ -116,7 +105,39 @@ class abl.batch.SocketClient:
     finally:
       assign set-size(mData) = 0.
     end finally.  
-  end method.     
+  end method. 
+  
+  method private logical SetupSocketConnection 
+    (ip_cServerName as character,
+     ip_iServerPort as integer):
+       
+    create socket hClientSocket.
+    hClientSocket:connect(ConnectionString(ip_cServerName,
+                                           ip_iServerPort)).       
+
+    return hClientSocket:connected().
+  end method.
+
+  method private character ConnectionString 
+    (ip_cServerName as character,
+     ip_iServerPort as integer):
+    
+    return substitute("-H &1 -S &2":u,
+                      (if ip_cServerName <> ? and ip_cServerName <> "":u 
+                          then ip_cServerName
+                          else "localhost":u),
+                      (if ip_iServerPort > 0 
+                          then ip_iServerPort
+                          else 44120)
+                      ).
+  end method.
+
+  method private void ReleaseSocketConnection ():
+    hClientSocket:disconnect() no-error. 
+    delete object hClientSocket no-error.
+
+    return.   
+  end method.      
 end class.
 /*----------------------------------------------------------------------------*/
 /* end-of-file: SocketClient.cls                                              */
