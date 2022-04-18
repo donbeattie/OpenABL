@@ -35,4 +35,4 @@ You can modify and add libraries by making pull requests or just open an issue.
 [src folder]: https://github.com/donbeattie/OpenABL/tree/master/src/
 [doc folder]: https://github.com/donbeattie/OpenABL/tree/master/docs/
 [contribute]: https://github.com/pages/donbeattie/OpenABL/contributing/HowToContribute/
-[documentation]: https://github.com/pages/donbeattie/OpenABL
+[documentation]: https://donbeattie.github.io/OpenABL/
