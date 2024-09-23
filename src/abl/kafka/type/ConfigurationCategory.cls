@@ -17,7 +17,8 @@
 */
 /*----------------------------------------------------------------------------*/
 enum abl.kafka.type.ConfigurationCategory:
-  define enum GENERAL
+  define enum GLOBAL
+              GENERAL
               CONSUMER
               PRODUCER
               TOPIC

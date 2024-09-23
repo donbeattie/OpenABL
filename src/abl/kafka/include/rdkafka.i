@@ -55,6 +55,12 @@
 &GLOBAL-DEFINE RD_KAFKA_MSG_STATUS_POSSIBLY_PERSISTED 1 /*  */
 &GLOBAL-DEFINE RD_KAFKA_MSG_STATUS_PERSISTED          2 /*  */
 
+// rd_kafka_consume_start (..., int64_t offset)
+&GLOBAL-DEFINE RD_KAFKA_OFFSET_BEGINNING    -2
+&GLOBAL-DEFINE RD_KAFKA_OFFSET_END          -1
+&GLOBAL-DEFINE RD_KAFKA_OFFSET_STORED    -1000
+&GLOBAL-DEFINE RD_KAFKA_OFFSET_INVALID   -1001
+
 // librdkafka to ABL Type Conversions
 &GLOBAL-DEFINE rd_kafka_conf_t                  {&PointerTypeABL}
 &GLOBAL-DEFINE rd_kafka_topic_conf_t            {&PointerTypeABL}
@@ -68,7 +74,5 @@
 &GLOBAL-DEFINE rd_kafka_type_t                  integer
 &GLOBAL-DEFINE rd_kafka_conf_res_t              integer
 &GLOBAL-DEFINE rd_kafka_resp_err_t              integer
-
-
 /*----------------------------------------------------------------------------*/
 /* end-of-file: rdkafka.i                                                     */

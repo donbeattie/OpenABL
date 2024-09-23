@@ -19,7 +19,7 @@
 block-level on error undo, throw.
 
 &if opsys begins "WIN":u &then
-  &scoped-define SharedLibrary Z:\Development\GitHub\OpenABL\librdkafka.dll           
+  &scoped-define SharedLibrary librdkafka.dll           
 &else
   &scoped-define SharedLibrary kafka/librdkafka.so
 &endif
@@ -139,14 +139,16 @@ class abl.kafka.librdkafka:
   method public void rd_kafka_destroy
     (ip_RK as {&rd_kafka_t}):
     define variable hCall as handle      no-undo.
-
-    hCall = this-object:CreateCall().
-    assign hCall:num-parameters = 1.
-
-    hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RK).
-
-    InvokeCall(hCall).
-
+    
+    if ip_RK > 0 then do:
+       hCall = this-object:CreateCall().
+       assign hCall:num-parameters = 1.
+   
+       hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RK).
+   
+       InvokeCall(hCall).
+    end.
+    
     return.
     finally:
       delete object hCall no-error.
@@ -208,14 +210,16 @@ class abl.kafka.librdkafka:
   method public void rd_kafka_topic_conf_destroy
     (ip_RKTopicConf as {&rd_kafka_topic_conf_t}):
     define variable hCall as handle      no-undo.
-
-    hCall = this-object:CreateCall().
-    assign hCall:num-parameters = 1.
-
-    hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RKTopicConf).
-
-    InvokeCall(hCall).
-
+    
+    if ip_RKTopicConf > 0 then do:
+       hCall = this-object:CreateCall().
+       assign hCall:num-parameters = 1.
+   
+       hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RKTopicConf).
+   
+       InvokeCall(hCall).
+    end.
+    
     return.
     finally:
       delete object hCall no-error.
@@ -255,12 +259,123 @@ class abl.kafka.librdkafka:
   method public void rd_kafka_topic_destroy
     (ip_RKTopic as {&rd_kafka_topic_t}):
     define variable hCall as handle      no-undo.
+    
+    if ip_RKTopic > 0 then do:
+       hCall = this-object:CreateCall().
+       assign hCall:num-parameters = 1.
+   
+       hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RKTopic).
+   
+       InvokeCall(hCall).
+    end.
+
+    return.
+    finally:
+      delete object hCall no-error.
+    end finally.
+  end method.
+  
+  method public integer rd_kafka_topic_partition_available
+   (ip_RKTopic    as {&rd_kafka_topic_t},
+    ip_iPartition as integer):
+    var handle hCall.
 
     hCall = this-object:CreateCall().
-    assign hCall:num-parameters = 1.
+    assign hCall:return-value-dll-type = "long":u
+           hCall:num-parameters        = 2
+           .
 
     hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RKTopic).
+    hCall:set-parameter(2, "long":u, "input":u, ip_iPartition).
+    
+    InvokeCall(hCall).
 
+    return hCall:return-value.
+    finally:
+      delete object hCall no-error.
+    end finally.  
+  end method.
+  
+  // START Some Legacy Methods...
+  
+  method public void rd_kafka_consume_start 
+   (ip_RKTopic    as {&rd_kafka_topic_t},
+    ip_iPartition as integer,
+    ip_iOffset    as int64):
+    var handle hCall.
+
+    hCall = this-object:CreateCall().
+    assign hCall:num-parameters = 3.
+
+    hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RKTopic).
+    hCall:set-parameter(2, "long":u, "input":u, ip_iPartition).
+    hCall:set-parameter(3, "int64":u, "input":u, ip_iOffset).
+    
+    InvokeCall(hCall).
+
+    return.
+    finally:
+      delete object hCall no-error.
+    end finally.  
+  end method.
+  
+  method public void rd_kafka_consume_stop 
+   (ip_RKTopic    as {&rd_kafka_topic_t},
+    ip_iPartition as integer):
+    var handle hCall.
+
+    hCall = this-object:CreateCall().
+    assign hCall:num-parameters = 2.
+
+    hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RKTopic).
+    hCall:set-parameter(2, "long":u, "input":u, ip_iPartition).
+    
+    InvokeCall(hCall).
+
+    return.
+    finally:
+      delete object hCall no-error.
+    end finally.  
+  end method.
+  
+  method public {&rd_kafka_message_t} rd_kafka_consume
+   (ip_RKTopic    as {&rd_kafka_topic_t},
+    ip_iPartition as integer,
+    ip_iTimeout   as integer):
+    var handle hCall.
+
+    hCall = this-object:CreateCall().
+    assign hCall:return-value-dll-type = "{&PointerTypeLIB}":u
+           hCall:num-parameters        = 3
+           .
+
+    hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RKTopic).
+    hCall:set-parameter(2, "long":u, "input":u, ip_iPartition).
+    hCall:set-parameter(3, "long":u, "input":u, ip_iTimeout).
+    
+    InvokeCall(hCall).
+
+    return hCall:return-value.
+    finally:
+      delete object hCall no-error.
+    end finally.  
+  end method.
+  
+  method public void rd_kafka_seek
+    (ip_RKTopic as {&rd_kafka_topic_t},
+     ip_iPartition as integer,
+     ip_iOffset    as int64,
+     ip_iTimoutMS  as integer):
+    define variable hCall as handle      no-undo.
+
+    hCall = this-object:CreateCall().
+    assign hCall:num-parameters = 4.
+
+    hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RKTopic).
+    hCall:set-parameter(2, "long":u, "input":u, ip_iPartition).
+    hCall:set-parameter(3, "int64":u, "input":u, ip_iOffset).
+    hCall:set-parameter(4, "long":u, "input":u, ip_iTimoutMS).
+    
     InvokeCall(hCall).
 
     return.
@@ -268,7 +383,51 @@ class abl.kafka.librdkafka:
       delete object hCall no-error.
     end finally.
   end method.
+  // END: Some Legacy Methods...
 
+
+  method public {&rd_kafka_error_t} rd_kafka_seek_partitions
+    (ip_RK            as {&rd_kafka_t},
+     ip_PartitionList as {&rd_kafka_topic_partition_list_t},
+     ip_iTimeoutMS    as integer):
+    define variable hCall as handle      no-undo.
+
+    hCall = this-object:CreateCall().
+    assign hCall:return-value-dll-type = "long":u
+           hCall:num-parameters        = 3
+           .
+    hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RK).
+    hCall:set-parameter(2, "{&PointerTypeLIB}":u, "input":u, ip_PartitionList).
+    hCall:set-parameter(3, "long":u,              "input":u, ip_iTimeoutMS).
+
+    InvokeCall(hCall).
+
+    return hCall:return-value.
+    finally:
+      delete object hCall no-error.
+    end finally.
+  end method.
+
+  method public {&rd_kafka_error_t} rd_kafka_assign
+    (ip_RK            as {&rd_kafka_t},
+     ip_PartitionList as {&rd_kafka_topic_partition_list_t}):
+    define variable hCall as handle      no-undo.
+
+    hCall = this-object:CreateCall().
+    assign hCall:return-value-dll-type = "long":u
+           hCall:num-parameters        = 2
+           .
+    hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RK).
+    hCall:set-parameter(2, "{&PointerTypeLIB}":u, "input":u, ip_PartitionList).
+
+    InvokeCall(hCall).
+
+    return hCall:return-value.
+    finally:
+      delete object hCall no-error.
+    end finally.
+  end method.
+  
   /* int rd_kafka_produce
        (rd_kafka_topic_t *rkt,
         int32_t partition,
@@ -409,12 +568,14 @@ class abl.kafka.librdkafka:
     (ip_RKMessage as {&rd_kafka_message_t}):
     define variable hCall as handle      no-undo.
 
-    hCall = this-object:CreateCall().
-    assign hCall:num-parameters = 1.
-
-    hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RKMessage).
-
-    InvokeCall(hCall).
+    if ip_RKMessage > 0 then do:
+       hCall = this-object:CreateCall().
+       assign hCall:num-parameters = 1.
+   
+       hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_RKMessage).
+   
+       InvokeCall(hCall).
+    end.
 
     return.
     finally:
@@ -550,6 +711,31 @@ class abl.kafka.librdkafka:
       delete object hCall no-error.
     end finally.
   end method.
+  
+  method public {&rd_kafka_resp_err_t} rd_kafka_topic_partition_list_set_offset
+    (ip_PartitionList as {&rd_kafka_topic_partition_list_t},
+     ip_cTopic        as character,
+     ip_iPartition    as integer,
+     ip_iOffset       as int64):
+    define variable hCall as handle      no-undo.
+
+    hCall = this-object:CreateCall().
+    assign hCall:return-value-dll-type = "long":u
+           hCall:num-parameters        = 4
+           .
+    hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_PartitionList).
+    hCall:set-parameter(2, "character":u,         "input":u, ip_cTopic).
+    hCall:set-parameter(3, "long":u,              "input":u, ip_iPartition).
+    hCall:set-parameter(4, "int64":u,             "input":u, ip_iPartition).
+
+    InvokeCall(hCall).
+
+    return hCall:return-value.
+    finally:
+      delete object hCall no-error.
+    end finally.
+  end method.
+
 
   /* void rd_kafka_topic_partition_list_destroy
        (rd_kafka_topic_partition_list_t *rkparlist);
@@ -558,14 +744,16 @@ class abl.kafka.librdkafka:
     (ip_PartitionList as {&rd_kafka_topic_partition_list_t}):
     define variable hCall as handle      no-undo.
 
-    hCall = this-object:CreateCall().
-    assign hCall:library-calling-convention = "cdecl":u
-           hCall:num-parameters             = 1
-           .
-    hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_PartitionList).
-
-    InvokeCall(hCall).
-
+    if ip_PartitionList > 0 then do:
+       hCall = this-object:CreateCall().
+       assign hCall:library-calling-convention = "cdecl":u
+              hCall:num-parameters             = 1
+              .
+       hCall:set-parameter(1, "{&PointerTypeLIB}":u, "input":u, ip_PartitionList).
+   
+       InvokeCall(hCall).
+    end.
+    
     return.
     finally:
       delete object hCall no-error.
